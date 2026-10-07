@@ -5,6 +5,8 @@ const {
   CLAIM_USER_ID,
   CLAIM_CHANNELS = "",
   CLAIM_TEXT = "Claimed ✋ I'm on it.",
+  CLAIM_MATCH = "", // optional regex; only messages matching it count as leads
+  CLAIM_BOTS = "true", // leads are often posted by forms/CRMs/workflows
 } = process.env;
 
 for (const [k, v] of Object.entries({ SLACK_APP_TOKEN, SLACK_USER_TOKEN, CLAIM_USER_ID })) {
@@ -12,7 +14,14 @@ for (const [k, v] of Object.entries({ SLACK_APP_TOKEN, SLACK_USER_TOKEN, CLAIM_U
 }
 
 const channels = new Set(CLAIM_CHANNELS.split(",").map((s) => s.trim()).filter(Boolean));
+const matcher = CLAIM_MATCH ? new RegExp(CLAIM_MATCH, "i") : null;
 const claimed = new Set();
+
+// Text of a message including attachments/blocks fallback text (bot-posted leads often put it there).
+function fullText(e) {
+  const parts = [e.text, ...(e.attachments || []).flatMap((a) => [a.pretext, a.title, a.text, a.fallback])];
+  return parts.filter(Boolean).join("\n");
+}
 
 async function slack(method, token, body) {
   const res = await fetch(`https://slack.com/api/${method}`, {
@@ -26,7 +35,11 @@ async function slack(method, token, body) {
 }
 
 async function claim(event) {
-  if (event.subtype || event.bot_id || event.user === CLAIM_USER_ID) return;
+  const isBot = event.subtype === "bot_message" || event.bot_id;
+  if (event.subtype && event.subtype !== "bot_message") return; // edits, joins, etc.
+  if (isBot && CLAIM_BOTS !== "true") return;
+  if (event.user === CLAIM_USER_ID) return;
+  if (matcher && !matcher.test(fullText(event))) return;
   if (event.thread_ts && event.thread_ts !== event.ts) return; // already a reply
   if (channels.size && !channels.has(event.channel)) return;
   if (claimed.has(event.ts)) return;

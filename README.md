@@ -10,4 +10,4 @@ Watches channels and, the instant a new thread starts, replies in it **as you** 
 5. `cp .env.example .env` and fill it in (set `CLAIM_USER_ID` to your member ID so your own posts are ignored).
 6. `npm start`
 
-Set `CLAIM_CHANNELS` to limit which channels are claimed and `CLAIM_TEXT` to change the reply.
+Set `CLAIM_CHANNELS` to your leads channel ID (right-click channel → View details → bottom). Bot/form-posted leads are claimed by default (`CLAIM_BOTS`); use `CLAIM_MATCH` (regex) to claim only matching messages. Change the reply with `CLAIM_TEXT`.
