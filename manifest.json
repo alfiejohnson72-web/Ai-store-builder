@@ -4,11 +4,14 @@
   "oauth_config": {
     "scopes": {
       "bot": ["channels:history", "groups:history", "chat:write"],
-      "user": ["chat:write"]
+      "user": ["chat:write", "channels:history", "groups:history"]
     }
   },
   "settings": {
-    "event_subscriptions": { "bot_events": ["message.channels", "message.groups"] },
+    "event_subscriptions": {
+      "bot_events": ["message.channels", "message.groups"],
+      "user_events": ["message.channels", "message.groups"]
+    },
     "socket_mode_enabled": true,
     "interactivity": { "is_enabled": true }
   }

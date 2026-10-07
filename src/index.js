@@ -86,9 +86,14 @@ async function claim(event) {
   panel();
 }
 
+// Lead channels are read through YOUR account (user token events), so the app never joins them.
 // Commands (only from you, only in Bot Control): on | off | watch #chan | unwatch #chan | status
+const seenControl = new Set();
 function control(event) {
   if (event.user !== CLAIM_USER_ID || event.subtype || event.bot_id) return;
+  if (seenControl.has(event.ts)) return; // same message delivered as bot event and user event
+  seenControl.add(event.ts);
+  if (seenControl.size > 500) seenControl.delete(seenControl.values().next().value);
   const text = (event.text || "").trim();
   const ids = [...text.matchAll(/<#(C[A-Z0-9]+)(?:\|[^>]*)?>/g)].map((m) => m[1]);
   const cmd = text.split(/\s+/)[0].toLowerCase();
@@ -139,7 +144,7 @@ async function catchUp() {
   try {
     for (const channel of state.channels) {
       if (!state.armed) break;
-      const { messages = [] } = await slack("conversations.history", SLACK_BOT_TOKEN, { channel, oldest: state.armedAt, limit: 50 });
+      const { messages = [] } = await slack("conversations.history", SLACK_USER_TOKEN, { channel, oldest: state.armedAt, limit: 50 });
       for (const m of messages.reverse()) await claim({ ...m, channel });
     }
   } catch (err) {
