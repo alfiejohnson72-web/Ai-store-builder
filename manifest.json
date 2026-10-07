@@ -9,6 +9,7 @@
   },
   "settings": {
     "event_subscriptions": { "bot_events": ["message.channels", "message.groups"] },
-    "socket_mode_enabled": true
+    "socket_mode_enabled": true,
+    "interactivity": { "is_enabled": true }
   }
 }
