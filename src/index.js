@@ -19,10 +19,15 @@ for (const [k, v] of Object.entries({ SLACK_APP_TOKEN, SLACK_USER_TOKEN, SLACK_B
 }
 
 const STATE_FILE = path.join(__dirname, "..", "state.json");
-const state = { armed: false, channels: CLAIM_CHANNELS.split(",").map((s) => s.trim()).filter(Boolean) };
+const state = { armed: false, armedAt: "0", channels: CLAIM_CHANNELS.split(",").map((s) => s.trim()).filter(Boolean) };
 try {
   Object.assign(state, JSON.parse(fs.readFileSync(STATE_FILE, "utf8")));
 } catch {}
+const arm = () => {
+  if (!state.armed) state.armedAt = (Date.now() / 1000 - 1).toFixed(6); // Slack ts format; 1s margin for clock skew
+  state.armed = true;
+  save();
+};
 const save = () => fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
 
 const matcher = CLAIM_MATCH ? new RegExp(CLAIM_MATCH, "i") : null;
@@ -46,22 +51,34 @@ function fullText(e) {
   return parts.filter(Boolean).join("\n");
 }
 
+// One immediate attempt, then up to 2 quick retries on transient errors.
+async function postWithRetry(event) {
+  for (let i = 0; ; i++) {
+    try {
+      return await slack("chat.postMessage", SLACK_USER_TOKEN, { channel: event.channel, thread_ts: event.ts, text: CLAIM_TEXT });
+    } catch (err) {
+      if (i >= 2 || /not_in_channel|channel_not_found|invalid_auth|token_revoked|missing_scope|is_archived/.test(err.message)) throw err;
+      await new Promise((r) => setTimeout(r, 150 * (i + 1)));
+    }
+  }
+}
+
 async function claim(event) {
   if (!state.armed || !state.channels.includes(event.channel)) return;
-  if (event.subtype && event.subtype !== "bot_message") return; // edits, joins, etc.
+  if (event.subtype && !["bot_message", "file_share"].includes(event.subtype)) return; // edits, joins, etc.
   if (event.user === CLAIM_USER_ID) return;
   if (event.thread_ts && event.thread_ts !== event.ts) return; // already a reply
   if (matcher && !matcher.test(fullText(event))) return;
   state.armed = false; // synchronous: guarantees only ONE lead is claimed
   const t0 = Date.now();
-  const post = slack("chat.postMessage", SLACK_USER_TOKEN, { channel: event.channel, thread_ts: event.ts, text: CLAIM_TEXT });
+  const post = postWithRetry(event);
   save(); // disk write happens while the reply is already in flight
   try {
     await post;
     console.log(`Claimed ${event.channel} ${event.ts} in ${Date.now() - t0}ms`);
     await say(`✅ Claimed 1 lead in <#${event.channel}> (replied "${CLAIM_TEXT}" in ${Date.now() - t0}ms). Now OFF.`);
   } catch (err) {
-    state.armed = true; // failed: stay armed so the next lead is still claimed
+    state.armed = true; // failed: stay armed (armedAt unchanged) so a lead is still claimed
     save();
     console.error("Claim failed:", err.message);
     say(`⚠️ Claim failed in <#${event.channel}>: ${err.message}. Still ON.`);
@@ -85,7 +102,7 @@ function control(event) {
     save();
     reply = `🛑 Stopped watching ${ids.map((i) => `<#${i}>`).join(", ")}`;
   } else if (cmd === "on") {
-    state.armed = true; save(); reply = "🟢 ON: will claim the next lead, then turn off";
+    arm(); reply = "🟢 ON: will claim the next lead, then turn off";
   } else if (cmd === "off") {
     state.armed = false; save(); reply = "🔴 OFF";
   } else if (cmd === "status") {
@@ -113,6 +130,26 @@ function panel() {
   }).catch((e) => console.error(e.message));
 }
 
+// Safety net: while ON, also look at the watched channels directly, so a dropped
+// websocket event can never cause a missed lead. Claims the OLDEST lead since ON.
+let polling = false;
+async function catchUp() {
+  if (!state.armed || polling) return;
+  polling = true;
+  try {
+    for (const channel of state.channels) {
+      if (!state.armed) break;
+      const { messages = [] } = await slack("conversations.history", SLACK_BOT_TOKEN, { channel, oldest: state.armedAt, limit: 50 });
+      for (const m of messages.reverse()) await claim({ ...m, channel });
+    }
+  } catch (err) {
+    console.error("catchUp:", err.message);
+  } finally {
+    polling = false;
+  }
+}
+setInterval(catchUp, 4000);
+
 async function connect() {
   const { url } = await slack("apps.connections.open", SLACK_APP_TOKEN);
   const ws = new WebSocket(url);
@@ -120,6 +157,7 @@ async function connect() {
     console.log("Lead claimer connected.");
     say("👋 Lead claimer is online.");
     panel();
+    catchUp(); // anything that landed while we were offline/reconnecting
   };
   ws.onmessage = (m) => {
     const msg = JSON.parse(m.data);
@@ -132,8 +170,8 @@ async function connect() {
     if (msg.type === "interactive" && msg.payload.user?.id === CLAIM_USER_ID) {
       const a = msg.payload.actions?.[0]?.action_id;
       if (a === "on" || a === "off") {
-        state.armed = a === "on";
-        save();
+        if (a === "on") arm();
+        else { state.armed = false; save(); }
         panel();
       }
     }
@@ -151,4 +189,5 @@ function retry(err) {
   setTimeout(() => connect().catch(retry), 3000);
 }
 
-connect().catch(retry);
+if (require.main === module) connect().catch(retry);
+module.exports = { claim, state, arm }; // for tests
