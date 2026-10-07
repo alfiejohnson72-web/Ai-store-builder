@@ -1,9 +1,9 @@
 {
-  "display_information": { "name": "Thread Claimer" },
-  "features": { "bot_user": { "display_name": "Thread Claimer", "always_online": true } },
+  "display_information": { "name": "Lead Claimer" },
+  "features": { "bot_user": { "display_name": "Lead Claimer", "always_online": true } },
   "oauth_config": {
     "scopes": {
-      "bot": ["channels:history", "groups:history", "channels:read", "groups:read"],
+      "bot": ["channels:history", "groups:history", "chat:write"],
       "user": ["chat:write"]
     }
   },

@@ -1,13 +1,20 @@
-# Slack Thread Claimer
+# Slack Lead Claimer
 
-Watches channels and, the instant a new thread starts, replies in it **as you** (using your user token) so you've claimed it first. Built directly on Slack's Socket Mode and Web API with no SDK and no dependencies (Node 22+).
+When a new lead lands in a channel you're watching, this replies **"T"** in its thread as you, within a second. You manage it from your own **Bot Control** channel. No SDK, no dependencies (Node 22+, works on Mac and Windows).
 
 ## Setup
-1. https://api.slack.com/apps → **Create New App → From manifest** → paste `manifest.json`.
-2. **Basic Information → App-Level Tokens**: create one with `connections:write` → `SLACK_APP_TOKEN`.
-3. **Install to Workspace**. Copy the User token (`xoxp-`) → `SLACK_USER_TOKEN`.
-4. Invite the app to channels you want watched: `/invite @Thread Claimer`.
-5. `cp .env.example .env` and fill it in (set `CLAIM_USER_ID` to your member ID so your own posts are ignored).
-6. `npm start`
+1. Create a private channel called **Bot Control**.
+2. https://api.slack.com/apps → **Create New App → From manifest** → paste `manifest.json`.
+3. **Basic Information → App-Level Tokens**: create one with `connections:write` → `SLACK_APP_TOKEN`.
+4. **Install to Workspace**. Copy the Bot token (`xoxb-`) and User token (`xoxp-`).
+5. In Bot Control run `/invite @Lead Claimer`. Invite it to each lead channel too.
+6. `cp .env.example .env` and fill it in (`CONTROL_CHANNEL` = Bot Control's channel ID: View details, bottom of the pane).
+7. `npm start` and leave it running.
 
-Set `CLAIM_CHANNELS` to your leads channel ID (right-click channel → View details → bottom). Bot/form-posted leads are claimed by default (`CLAIM_BOTS`); use `CLAIM_MATCH` (regex) to claim only matching messages. Change the reply with `CLAIM_TEXT`.
+## Commands (type in Bot Control; only you are obeyed)
+- `watch #opt-in-1`: start claiming leads there
+- `unwatch #opt-in-1`
+- `pause` / `resume`
+- `status`
+
+Bot- or form-posted leads are claimed too. Set `CLAIM_MATCH` (regex) if a channel has non-lead chatter.
