@@ -1,0 +1,14 @@
+{
+  "display_information": { "name": "Thread Claimer" },
+  "features": { "bot_user": { "display_name": "Thread Claimer", "always_online": true } },
+  "oauth_config": {
+    "scopes": {
+      "bot": ["channels:history", "groups:history", "channels:read", "groups:read"],
+      "user": ["chat:write"]
+    }
+  },
+  "settings": {
+    "event_subscriptions": { "bot_events": ["message.channels", "message.groups"] },
+    "socket_mode_enabled": true
+  }
+}

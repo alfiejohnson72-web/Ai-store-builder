@@ -1,0 +1,11 @@
+{
+  "name": "slack-thread-claimer",
+  "version": "1.0.0",
+  "description": "Instantly claims new Slack threads by replying as you",
+  "main": "src/index.js",
+  "scripts": { "start": "node src/index.js" },
+  "dependencies": {
+    "@slack/bolt": "^4.0.0",
+    "dotenv": "^16.4.5"
+  }
+}
