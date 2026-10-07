@@ -9,7 +9,6 @@ const {
   SLACK_BOT_TOKEN,
   CLAIM_USER_ID,
   CONTROL_CHANNEL, // channel ID of "Bot Control"
-  CLAIM_TEXT = "t",
   CLAIM_CHANNELS = "", // optional initial watch list (channel IDs, comma separated)
   CLAIM_MATCH = "", // optional regex: only messages matching it count as leads
 } = process.env;
@@ -30,9 +29,15 @@ const arm = () => {
 };
 const save = () => fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
 
+const CLAIM_TEXT = "t"; // the reply is always exactly "t"
+// The reply must land 0.7s-1.0s after the lead was posted; aim for the middle.
+const MIN_MS = 700, MAX_MS = 1000, TARGET_MS = 850;
 const matcher = CLAIM_MATCH ? new RegExp(CLAIM_MATCH, "i") : null;
 
+let clockOffset = 0; // serverMs - localMs, learned from chat.postMessage responses
+let corr = -120; // ms; learned: shifts our send time so the reply LANDS at TARGET_MS
 async function slack(method, token, body) {
+  const t0 = Date.now();
   const res = await fetch(`https://slack.com/api/${method}`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json; charset=utf-8" },
@@ -40,6 +45,10 @@ async function slack(method, token, body) {
   });
   const json = await res.json();
   if (!json.ok) throw new Error(`${method}: ${json.error}`);
+  if (method === "chat.postMessage" && json.ts) {
+    const sample = Number(json.ts) * 1000 - (t0 + Date.now()) / 2; // server stamped it about mid-flight
+    clockOffset = clockOffset === 0 ? sample : clockOffset * 0.7 + sample * 0.3;
+  }
   return json;
 }
 
@@ -70,13 +79,21 @@ async function claim(event) {
   if (event.thread_ts && event.thread_ts !== event.ts) return; // already a reply
   if (matcher && !matcher.test(fullText(event))) return;
   state.armed = false; // synchronous: guarantees only ONE lead is claimed
-  const t0 = Date.now();
-  const post = postWithRetry(event);
-  save(); // disk write happens while the reply is already in flight
+  save();
+  // Wait until the reply will LAND TARGET_MS after the lead, by Slack's clock.
+  const leadMs = Number(event.ts) * 1000;
+  const wait = leadMs + TARGET_MS + corr - (Date.now() + clockOffset);
+  if (wait > 0) await new Promise((r) => setTimeout(r, wait));
   try {
-    await post;
-    console.log(`Claimed ${event.channel} ${event.ts} in ${Date.now() - t0}ms`);
-    await say(`✅ Claimed 1 lead in <#${event.channel}> (replied "${CLAIM_TEXT}" in ${Date.now() - t0}ms). Now OFF.`);
+    const sent = await postWithRetry(event);
+    const actual = Math.round(Number(sent.ts) * 1000 - leadMs); // exact: Slack's own timestamps
+    if (Number.isFinite(actual)) {
+      corr -= (actual - TARGET_MS) * 0.7; // learn for next time
+      corr = Math.max(-600, Math.min(300, corr));
+    }
+    const ok = actual >= MIN_MS && actual <= MAX_MS;
+    console.log(`Claimed ${event.channel} ${event.ts}: reply landed ${actual}ms after the lead`);
+    await say(`${ok ? "✅" : "⚠️"} Claimed 1 lead in <#${event.channel}>: replied "${CLAIM_TEXT}" ${actual}ms after it was posted${ok ? "" : " (outside the 700-1000ms window)"}. Now OFF.`);
   } catch (err) {
     state.armed = true; // failed: stay armed (armedAt unchanged) so a lead is still claimed
     save();
@@ -111,7 +128,7 @@ function control(event) {
   } else if (cmd === "off") {
     state.armed = false; save(); reply = "🔴 OFF";
   } else if (cmd === "status") {
-    reply = `${state.armed ? "🟢 ON" : "🔴 OFF"} · reply "${CLAIM_TEXT}" · watching: ${state.channels.map((c) => `<#${c}>`).join(", ") || "nothing yet (type: watch #optin-1)"}`;
+    reply = `${state.armed ? "🟢 ON" : "🔴 OFF"} · reply "${CLAIM_TEXT}" at ${MIN_MS}-${MAX_MS}ms · watching: ${state.channels.map((c) => `<#${c}>`).join(", ") || "nothing yet (type: watch #optin-1)"}`;
   } else {
     panel();
     return;
@@ -153,7 +170,7 @@ async function catchUp() {
     polling = false;
   }
 }
-setInterval(catchUp, 4000);
+setInterval(catchUp, 1500);
 
 async function connect() {
   const { url } = await slack("apps.connections.open", SLACK_APP_TOKEN);
@@ -195,4 +212,4 @@ function retry(err) {
 }
 
 if (require.main === module) connect().catch(retry);
-module.exports = { claim, state, arm }; // for tests
+module.exports = { claim, state, arm, slack }; // for tests
