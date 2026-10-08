@@ -119,6 +119,7 @@ const HINTS = {
   not_in_channel: "the account/bot isn't in that channel",
 };
 const hint = (msg) => {
+  if (/aborted due to timeout|timed out|fetch failed|ENOTFOUND|ECONNRESET|EAI_AGAIN/i.test(msg)) return "Slack or your internet was too slow to answer just then. This is usually temporary";
   const code = (msg.split(": ")[1] || "").trim();
   return HINTS[code] ? `${msg} (${HINTS[code]})` : msg;
 };
@@ -290,19 +291,23 @@ function panel() {
 // ---------- safety net: while ON, also read the channels directly ----------
 let polling = false;
 let pollPausedUntil = 0;
+let pollFails = 0; // consecutive failed backup checks
 async function catchUp() {
   if (!state.armed || polling || Date.now() < pollPausedUntil) return;
   polling = true;
   try {
     for (const channel of state.channels) {
       if (!state.armed) break;
-      const { messages = [] } = await slack("conversations.history", SLACK_USER_TOKEN, { channel, oldest: state.armedAt, limit: 50 }, 4000);
+      const { messages = [] } = await slack("conversations.history", SLACK_USER_TOKEN, { channel, oldest: state.armedAt, limit: 50 }, 7000);
       for (const m of messages.reverse()) await claim({ ...m, channel });
     }
+    pollFails = 0;
   } catch (err) {
-    pollPausedUntil = Date.now() + 10000; // don't hammer Slack while it's failing
+    pollFails++;
+    pollPausedUntil = Date.now() + (pollFails > 1 ? 10000 : 2000); // don't hammer Slack while it's failing
     log("catchUp:", err.message);
-    alertOnce("poll:" + err.message, `⚠️ Backup check can't read your channel: ${hint(err.message)}. Type \`check\` for details.`);
+    // One slow answer is normal (the main connection still works). Only warn if it keeps failing.
+    if (pollFails >= 3) alertOnce("poll:" + hint(err.message), `⚠️ Backup check has failed ${pollFails} times in a row: ${hint(err.message)}. The main connection may still be fine. Type \`check\` for details.`);
   } finally {
     polling = false;
   }
