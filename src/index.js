@@ -1,6 +1,6 @@
 // Zero-dependency Slack lead claimer: Socket Mode over WebSocket + Web API over fetch.
 // Press On in Bot Control -> claims the NEXT lead in watched channels with a lowercase "t" (as you),
-// lands the reply 700-1000ms after the lead, then turns itself off.
+// lands the reply ~1000-1200ms after the lead, then turns itself off.
 const fs = require("node:fs");
 const path = require("node:path");
 
@@ -26,7 +26,7 @@ if (!/^[CG][A-Z0-9]+$/.test(CONTROL_CHANNEL)) problems.push("CONTROL_CHANNEL mus
 if (problems.length) throw new Error("Fix your .env file:\n - " + problems.join("\n - "));
 
 const CLAIM_TEXT = "t"; // the reply is always exactly "t"
-const MIN_MS = 700, MAX_MS = 1000, TARGET_MS = 850; // reply must land this long after the lead
+const MIN_MS = 1000, MAX_MS = 1200, TARGET_MS = 1100; // reply must land this long after the lead
 const matcher = CLAIM_MATCH ? new RegExp(CLAIM_MATCH, "i") : null;
 const log = (...a) => console.log(new Date().toLocaleTimeString(), ...a);
 
@@ -181,7 +181,7 @@ async function claim(event) {
 
   // Wait until the reply will LAND TARGET_MS after the lead, by Slack's clock (bounded, so a bad clock can't stall us).
   const leadMs = Number(event.ts) * 1000;
-  const wait = Math.max(0, Math.min(1200, leadMs + TARGET_MS + corr - (Date.now() + clockOffset)));
+  const wait = Math.max(0, Math.min(1700, leadMs + TARGET_MS + corr - (Date.now() + clockOffset)));
   await new Promise((r) => setTimeout(r, wait));
 
   try {
@@ -190,13 +190,13 @@ async function claim(event) {
     } else {
       const sent = await postWithRetry(event);
       const actual = Math.round(Number(sent.ts) * 1000 - leadMs); // exact: Slack's own timestamps
-      if (Number.isFinite(actual) && sent.tries === 1) { // learn only from clean, first-try claims
-        const step = Math.max(-150, Math.min(150, (actual - TARGET_MS) * 0.7));
+      if (Number.isFinite(actual) && sent.tries === 1 && Math.abs(actual - TARGET_MS) < 300) { // learn only from clean, first-try, non-spike claims
+        const step = Math.max(-100, Math.min(100, (actual - TARGET_MS) * 0.3));
         corr = Math.max(-600, Math.min(300, corr - step));
       }
       const ok = actual >= MIN_MS && actual <= MAX_MS;
       log(`Claimed ${event.channel} ${event.ts}: reply landed ${actual}ms after the lead`);
-      await say(`${ok ? "✅" : "⚠️"} Claimed 1 lead in <#${event.channel}>: replied "${CLAIM_TEXT}" ${actual}ms after it was posted${ok ? "" : " (outside the 700-1000ms window)"}. Now OFF.`);
+      await say(`${ok ? "✅" : "⚠️"} Claimed 1 lead in <#${event.channel}>: replied "${CLAIM_TEXT}" ${actual}ms after it was posted${ok ? "" : " (outside the 1000-1200ms window)"}. Now OFF.`);
     }
   } catch (err) {
     state.armed = true; // failed: stay armed so the next lead is still claimed
@@ -231,7 +231,8 @@ function control(event) {
     reply = `🛑 Stopped watching ${ids.map((i) => `<#${i}>`).join(", ")}`;
   } else if (cmd === "on") {
     arm();
-    reply = state.channels.length ? "🟢 ON: will claim the next lead, then turn off" : "🟢 ON, but you are not watching any channel yet. Type: watch #your-leads-channel";
+    reply = "🟢 ON: will claim the next lead, then turn off";
+    after = () => warnIfNotReady("Bot is ON");
   } else if (cmd === "off") {
     state.armed = false; save(); reply = "🔴 OFF";
   } else if (cmd === "check") {
@@ -281,8 +282,27 @@ async function catchUp() {
     polling = false;
   }
 }
-setInterval(() => catchUp().catch(() => {}), 1500);
+setInterval(() => catchUp().catch(() => {}), 1200);
 setInterval(() => { if (state.armed) calibrate(); }, 180000); // keep the clock fresh while ON
+setInterval(() => slack("auth.test", SLACK_USER_TOKEN, {}, 4000).catch(() => {}), 15000); // keep the connection warm: no slow handshake when a lead lands
+
+// While ON, re-check every 5 minutes that keys and channels still work, so a problem is reported BEFORE a lead arrives.
+async function readiness() {
+  const bad = [];
+  try { await slack("auth.test", SLACK_USER_TOKEN); } catch (e) { bad.push(`your account key: ${hint(e.message)}`); }
+  try { await slack("auth.test", SLACK_BOT_TOKEN); } catch (e) { bad.push(`bot key: ${hint(e.message)}`); }
+  for (const channel of state.channels) {
+    try { await slack("conversations.history", SLACK_USER_TOKEN, { channel, limit: 1 }); } catch (e) { bad.push(`<#${channel}>: ${hint(e.message)}`); }
+  }
+  if (!state.channels.length) bad.push("not watching any channel (type: watch #your-leads-channel)");
+  return bad;
+}
+async function warnIfNotReady(prefix) {
+  const bad = await readiness();
+  if (bad.length) await say(`⚠️ ${prefix} but NOT READY, a lead would be missed:\n• ${bad.join("\n• ")}\nType \`check\` for details.`);
+  return bad.length === 0;
+}
+setInterval(() => { if (state.armed) warnIfNotReady("Bot is ON").catch(() => {}); }, 300000);
 
 // ---------- connection: reconnects forever, with a watchdog ----------
 let ws = null;
@@ -311,6 +331,7 @@ function onMessage(msg) {
       if (a === "on") arm();
       else { state.armed = false; save(); }
       panel();
+      if (a === "on") warnIfNotReady("Bot is ON").catch((e) => log("readiness failed:", e.message));
     }
   }
 }
