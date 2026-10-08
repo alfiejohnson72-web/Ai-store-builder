@@ -34,6 +34,11 @@ const log = (...a) => console.log(new Date().toLocaleTimeString(), ...a);
 process.on("uncaughtException", (e) => log("Unexpected error (kept running):", e && e.message));
 process.on("unhandledRejection", (e) => log("Unexpected rejection (kept running):", e && e.message));
 
+// Background jobs are registered here and started only inside the real bot process.
+const timerJobs = [];
+function every(fn, ms) { timerJobs.push([fn, ms]); }
+function startTimers() { for (const [fn, ms] of timerJobs) setInterval(fn, ms); }
+
 // ---------- state (written atomically so a crash can't corrupt it) ----------
 const STATE_FILE = path.join(__dirname, "..", "state.json");
 const state = { armed: false, armedAt: "0", channels: CLAIM_CHANNELS.split(",").map((s) => s.trim()).filter(Boolean) };
@@ -312,9 +317,9 @@ async function catchUp() {
     polling = false;
   }
 }
-setInterval(() => catchUp().catch(() => {}), 1200);
-setInterval(() => { if (state.armed) calibrate(); }, 180000); // keep the clock fresh while ON
-setInterval(() => slack("auth.test", SLACK_USER_TOKEN, {}, 4000).catch(() => {}), 15000); // keep the connection warm: no slow handshake when a lead lands
+every(() => catchUp().catch(() => {}), 1200);
+every(() => { if (state.armed) calibrate(); }, 180000); // keep the clock fresh while ON
+every(() => slack("auth.test", SLACK_USER_TOKEN, {}, 4000).catch(() => {}), 15000); // keep the connection warm: no slow handshake when a lead lands
 
 // While ON, re-check every 5 minutes that keys and channels still work, so a problem is reported BEFORE a lead arrives.
 async function readiness() {
@@ -332,7 +337,7 @@ async function warnIfNotReady(prefix) {
   if (bad.length) await say(`⚠️ ${prefix} but NOT READY, a lead would be missed:\n• ${bad.join("\n• ")}\nType \`check\` for details.`);
   return bad.length === 0;
 }
-setInterval(() => { if (state.armed) warnIfNotReady("Bot is ON").catch(() => {}); }, 300000);
+every(() => { if (state.armed) warnIfNotReady("Bot is ON").catch(() => {}); }, 300000);
 
 // ---------- connection: reconnects forever, with a watchdog ----------
 let ws = null;
@@ -410,7 +415,7 @@ async function connect() {
 }
 
 // Watchdog: if nothing has been heard for 3 minutes the connection may be dead without saying so; start a fresh one.
-setInterval(() => {
+every(() => {
   if (!ws || Date.now() - lastActivity < 180000) return;
   log("No activity for 3 minutes, reconnecting...");
   const old = ws;
@@ -420,5 +425,31 @@ setInterval(() => {
   connect();
 }, 30000);
 
-if (require.main === module) connect();
+// Supervisor: runs the bot as a child process and restarts it within 2 seconds if it ever exits for any reason.
+function supervise() {
+  const { spawn } = require("node:child_process");
+  let stopping = false;
+  let child = null;
+  const run = () => {
+    child = spawn(process.execPath, [__filename], { stdio: "inherit", env: { ...process.env, BOT_CHILD: "1" } });
+    child.on("exit", (code, signal) => {
+      if (stopping) process.exit(0);
+      log(`Bot stopped (${signal || "code " + code}). Restarting in 2 seconds...`);
+      setTimeout(run, 2000);
+    });
+  };
+  for (const sig of ["SIGINT", "SIGTERM"]) {
+    process.on(sig, () => { stopping = true; try { child && child.kill(); } catch {} setTimeout(() => process.exit(0), 500); });
+  }
+  run();
+}
+
+if (require.main === module) {
+  if (process.env.BOT_CHILD) {
+    startTimers();
+    connect();
+  } else {
+    supervise();
+  }
+}
 module.exports = { claim, state, arm, slack, calibrate, pickReplyCount, config }; // for tests
