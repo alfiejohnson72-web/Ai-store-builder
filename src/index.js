@@ -152,6 +152,29 @@ async function selfCheck() {
 }
 
 // ---------- claiming ----------
+// How many "t" replies to send: 20% just one, 80% two to four (max 4), like quick manual spamming.
+const config = { forceCount: null }; // tests only
+function pickReplyCount(rand = Math.random) {
+  if (config.forceCount) return config.forceCount;
+  const r = rand();
+  if (r < 0.2) return 1;
+  if (r < 0.6) return 2; // 40%
+  if (r < 0.88) return 3; // 28%
+  return 4; // 12%
+}
+// Follow-up "t"s after the first, a fraction of a second apart. Never affects the claim itself.
+async function sendFollowUps(event, count) {
+  for (let i = 1; i < count; i++) {
+    await new Promise((r) => setTimeout(r, 250 + Math.random() * 550));
+    try {
+      await slack("chat.postMessage", SLACK_USER_TOKEN, { channel: event.channel, thread_ts: event.ts, text: CLAIM_TEXT }, 4000);
+    } catch (e) {
+      log("follow-up t failed:", e.message);
+      return;
+    }
+  }
+}
+
 // One immediate attempt, then up to 2 quick retries on transient errors.
 async function postWithRetry(event) {
   for (let i = 0; ; i++) {
@@ -195,8 +218,10 @@ async function claim(event) {
         corr = Math.max(-600, Math.min(300, corr - step));
       }
       const ok = actual >= MIN_MS && actual <= MAX_MS;
-      log(`Claimed ${event.channel} ${event.ts}: reply landed ${actual}ms after the lead`);
-      await say(`${ok ? "✅" : "⚠️"} Claimed 1 lead in <#${event.channel}>: replied "${CLAIM_TEXT}" ${actual}ms after it was posted${ok ? "" : " (outside the 1000-1200ms window)"}. Now OFF.`);
+      const count = pickReplyCount();
+      sendFollowUps(event, count).catch((e) => log("follow-ups error:", e.message)); // runs in the background
+      log(`Claimed ${event.channel} ${event.ts}: reply landed ${actual}ms after the lead (${count} t's)`);
+      await say(`${ok ? "✅" : "⚠️"} Claimed 1 lead in <#${event.channel}>: replied "${CLAIM_TEXT}" ${count > 1 ? `x${count} ` : ""}(first one ${actual}ms after it was posted)${ok ? "" : " (outside the 1000-1200ms window)"}. Now OFF.`);
     }
   } catch (err) {
     state.armed = true; // failed: stay armed so the next lead is still claimed
@@ -391,4 +416,4 @@ setInterval(() => {
 }, 30000);
 
 if (require.main === module) connect();
-module.exports = { claim, state, arm, slack, calibrate }; // for tests
+module.exports = { claim, state, arm, slack, calibrate, pickReplyCount, config }; // for tests
