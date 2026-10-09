@@ -43,7 +43,7 @@ function startTimers() { for (const [fn, ms] of timerJobs) setInterval(fn, ms); 
 // ---------- state (written atomically so a crash can't corrupt it) ----------
 const STATE_FILE = path.join(__dirname, "..", "state.json");
 const NEVER_REPLY_NAMES = ["Jase Chijioke"]; // built in: never reply to this person, or to alerts naming them
-const state = { armed: false, armedAt: "0", ignoredUsers: [], ignoredNames: [], channels: CLAIM_CHANNELS.split(",").map((s) => s.trim()).filter(Boolean) };
+const state = { armed: false, armedAt: "0", leadBotId: null, ignoredUsers: [], ignoredNames: [], channels: CLAIM_CHANNELS.split(",").map((s) => s.trim()).filter(Boolean) };
 try {
   Object.assign(state, JSON.parse(fs.readFileSync(STATE_FILE, "utf8")));
 } catch {}
@@ -112,11 +112,14 @@ function alertOnce(key, text) {
   say(text);
 }
 
-// A lead is ONLY a message posted by the lead-alert app (AIBot / "New Lead Alert"). Messages from people are never claimed.
+// A lead is ONLY a message posted by the AIBot app. Messages from people and from any other app are never claimed.
+// Once the first real AIBot lead is claimed, the bot remembers AIBot's app ID and from then on accepts only that exact app.
 function isLeadAlert(e) {
   if (!e.bot_id) return false; // posted by a person, not an app
+  if (state.leadBotId) return e.bot_id === state.leadBotId;
   const names = [e.bot_profile && e.bot_profile.name, e.username].filter(Boolean).map((n) => String(n).toLowerCase());
-  return names.includes(LEAD_BOT_NAME) || /new lead alert/i.test(fullText(e));
+  if (names.length) return names.includes(LEAD_BOT_NAME); // a name is shown: it must be AIBot
+  return /new lead alert/i.test(fullText(e)); // no name shown by Slack: fall back on the alert text
 }
 
 // True if this message is from (or about) someone on the never-reply list.
@@ -243,6 +246,7 @@ async function claim(event) {
         corr = Math.max(-600, Math.min(300, corr - step));
       }
       const ok = actual >= MIN_MS && actual <= MAX_MS;
+      if (!state.leadBotId && event.bot_id) { state.leadBotId = event.bot_id; save(); } // lock onto AIBot
       const count = pickReplyCount();
       sendFollowUps(event, count).catch((e) => log("follow-ups error:", e.message)); // runs in the background
       log(`Claimed ${event.channel} ${event.ts}: reply landed ${actual}ms after the lead (${count} t's)`);
@@ -301,12 +305,14 @@ function control(event) {
       save();
       reply = `✅ Removed from the never-reply list: ${[...users.map((u) => `<@${u}>`), name].filter(Boolean).join(", ")}`;
     }
+  } else if (cmd === "forgetbot") {
+    state.leadBotId = null; save(); reply = "🔓 Forgot AIBot's app ID. It will learn it again from the next claimed lead.";
   } else if (cmd === "ignored") {
     reply = `🚫 Never replying to: ${[...NEVER_REPLY_NAMES, ...state.ignoredNames, ...state.ignoredUsers.map((u) => `<@${u}>`)].join(", ")}`;
   } else if (cmd === "check") {
     after = selfCheck;
   } else if (cmd === "status") {
-    reply = `${state.armed ? "🟢 ON" : "🔴 OFF"} · reply "${CLAIM_TEXT}" at ${MIN_MS}-${MAX_MS}ms · watching: ${state.channels.map((c) => `<#${c}>`).join(", ") || "nothing yet"}\nCommands: on, off, status, check, watch #channel, unwatch #channel, ignore @person, unignore @person, ignored`;
+    reply = `${state.armed ? "🟢 ON" : "🔴 OFF"} · reply "${CLAIM_TEXT}" at ${MIN_MS}-${MAX_MS}ms · watching: ${state.channels.map((c) => `<#${c}>`).join(", ") || "nothing yet"} · replies only to ${state.leadBotId ? "AIBot (locked to its app ID)" : "AIBot"}\nCommands: on, off, status, check, watch #channel, unwatch #channel, ignore @person, unignore @person, ignored`;
   } else {
     panel();
     return;
