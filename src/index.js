@@ -42,7 +42,8 @@ function startTimers() { for (const [fn, ms] of timerJobs) setInterval(fn, ms); 
 
 // ---------- state (written atomically so a crash can't corrupt it) ----------
 const STATE_FILE = path.join(__dirname, "..", "state.json");
-const state = { armed: false, armedAt: "0", channels: CLAIM_CHANNELS.split(",").map((s) => s.trim()).filter(Boolean) };
+const NEVER_REPLY_NAMES = ["Jase Chijioke"]; // built in: never reply to this person, or to alerts naming them
+const state = { armed: false, armedAt: "0", ignoredUsers: [], ignoredNames: [], channels: CLAIM_CHANNELS.split(",").map((s) => s.trim()).filter(Boolean) };
 try {
   Object.assign(state, JSON.parse(fs.readFileSync(STATE_FILE, "utf8")));
 } catch {}
@@ -116,6 +117,14 @@ function isLeadAlert(e) {
   if (!e.bot_id) return false; // posted by a person, not an app
   const names = [e.bot_profile && e.bot_profile.name, e.username].filter(Boolean).map((n) => String(n).toLowerCase());
   return names.includes(LEAD_BOT_NAME) || /new lead alert/i.test(fullText(e));
+}
+
+// True if this message is from (or about) someone on the never-reply list.
+function isIgnored(e) {
+  if (e.user && state.ignoredUsers.includes(e.user)) return true;
+  const hay = [fullText(e), e.username, e.bot_profile && e.bot_profile.name, e.user_profile && e.user_profile.real_name, e.user_profile && e.user_profile.display_name]
+    .filter(Boolean).join("\n").toLowerCase();
+  return [...NEVER_REPLY_NAMES, ...state.ignoredNames].some((n) => n && hay.includes(String(n).toLowerCase()));
 }
 
 function fullText(e) {
@@ -206,6 +215,7 @@ async function claim(event) {
   if (!state.armed || !state.channels.includes(event.channel)) return;
   if (event.subtype && !["bot_message", "file_share"].includes(event.subtype)) return; // edits, joins, etc.
   if (event.user === CLAIM_USER_ID) return;
+  if (isIgnored(event)) return; // never reply to people on the list (the bot stays ON for the next lead)
   if (!isLeadAlert(event)) return; // only AIBot lead alerts, never normal messages
   if (event.thread_ts && event.thread_ts !== event.ts) return; // already a reply
   if (matcher && !matcher.test(fullText(event))) return;
@@ -275,10 +285,28 @@ function control(event) {
     after = () => warnIfNotReady("Bot is ON");
   } else if (cmd === "off") {
     state.armed = false; save(); reply = "🔴 OFF";
+  } else if (cmd === "ignore" || cmd === "unignore") {
+    const users = [...text.matchAll(/<@([UW][A-Z0-9]+)(?:\|[^>]*)?>/g)].map((m) => m[1]);
+    const name = text.replace(/^\S+\s*/, "").replace(/<[@#][^>]*>/g, "").replace(/\s+/g, " ").trim();
+    if (!users.length && !name) {
+      reply = `Type: ${cmd} @person   (or: ${cmd} Their Name)`;
+    } else if (cmd === "ignore") {
+      for (const u of users) if (!state.ignoredUsers.includes(u)) state.ignoredUsers.push(u);
+      if (name && !state.ignoredNames.some((n) => n.toLowerCase() === name.toLowerCase())) state.ignoredNames.push(name);
+      save();
+      reply = `🚫 I will never reply to: ${[...users.map((u) => `<@${u}>`), name].filter(Boolean).join(", ")}`;
+    } else {
+      state.ignoredUsers = state.ignoredUsers.filter((u) => !users.includes(u));
+      state.ignoredNames = state.ignoredNames.filter((n) => n.toLowerCase() !== name.toLowerCase());
+      save();
+      reply = `✅ Removed from the never-reply list: ${[...users.map((u) => `<@${u}>`), name].filter(Boolean).join(", ")}`;
+    }
+  } else if (cmd === "ignored") {
+    reply = `🚫 Never replying to: ${[...NEVER_REPLY_NAMES, ...state.ignoredNames, ...state.ignoredUsers.map((u) => `<@${u}>`)].join(", ")}`;
   } else if (cmd === "check") {
     after = selfCheck;
   } else if (cmd === "status") {
-    reply = `${state.armed ? "🟢 ON" : "🔴 OFF"} · reply "${CLAIM_TEXT}" at ${MIN_MS}-${MAX_MS}ms · watching: ${state.channels.map((c) => `<#${c}>`).join(", ") || "nothing yet"}\nCommands: on, off, status, check, watch #channel, unwatch #channel`;
+    reply = `${state.armed ? "🟢 ON" : "🔴 OFF"} · reply "${CLAIM_TEXT}" at ${MIN_MS}-${MAX_MS}ms · watching: ${state.channels.map((c) => `<#${c}>`).join(", ") || "nothing yet"}\nCommands: on, off, status, check, watch #channel, unwatch #channel, ignore @person, unignore @person, ignored`;
   } else {
     panel();
     return;
