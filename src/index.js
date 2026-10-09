@@ -1,6 +1,6 @@
 // Zero-dependency Slack lead claimer: Socket Mode over WebSocket + Web API over fetch.
 // Press On in Bot Control -> claims the NEXT lead in watched channels with a lowercase "t" (as you),
-// lands the reply ~1000-1200ms after the lead, then turns itself off.
+// lands the reply ~1200-1400ms after the lead, then turns itself off.
 const fs = require("node:fs");
 const path = require("node:path");
 
@@ -27,7 +27,7 @@ if (!/^[CG][A-Z0-9]+$/.test(CONTROL_CHANNEL)) problems.push("CONTROL_CHANNEL mus
 if (problems.length) throw new Error("Fix your .env file:\n - " + problems.join("\n - "));
 
 const CLAIM_TEXT = "t"; // the reply is always exactly "t"
-const MIN_MS = 1000, MAX_MS = 1200, TARGET_MS = 1100; // reply must land this long after the lead
+const MIN_MS = 1200, MAX_MS = 1400, TARGET_MS = 1300; // reply must land this long after the lead
 const matcher = CLAIM_MATCH ? new RegExp(CLAIM_MATCH, "i") : null;
 const log = (...a) => console.log(new Date().toLocaleTimeString(), ...a);
 
@@ -236,7 +236,7 @@ async function claim(event) {
       const count = pickReplyCount();
       sendFollowUps(event, count).catch((e) => log("follow-ups error:", e.message)); // runs in the background
       log(`Claimed ${event.channel} ${event.ts}: reply landed ${actual}ms after the lead (${count} t's)`);
-      await say(`${ok ? "✅" : "⚠️"} Claimed 1 lead in <#${event.channel}>: replied "${CLAIM_TEXT}" ${count > 1 ? `x${count} ` : ""}(first one ${actual}ms after it was posted)${ok ? "" : " (outside the 1000-1200ms window)"}. Now OFF.`);
+      await say(`${ok ? "✅" : "⚠️"} Claimed 1 lead in <#${event.channel}>: replied "${CLAIM_TEXT}" ${count > 1 ? `x${count} ` : ""}(first one ${actual}ms after it was posted)${ok ? "" : " (outside the 1200-1400ms window)"}. Now OFF.`);
     }
   } catch (err) {
     state.armed = true; // failed: stay armed so the next lead is still claimed
