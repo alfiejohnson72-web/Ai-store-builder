@@ -13,6 +13,7 @@ const CLAIM_USER_ID = env("CLAIM_USER_ID");
 const CONTROL_CHANNEL = env("CONTROL_CHANNEL");
 const CLAIM_CHANNELS = env("CLAIM_CHANNELS");
 const CLAIM_MATCH = env("CLAIM_MATCH");
+const LEAD_BOT_NAME = (env("LEAD_BOT_NAME") || "AIBot").toLowerCase(); // the app that posts your lead alerts
 
 if (SLACK_BOT_TOKEN.startsWith("xoxp-") && SLACK_USER_TOKEN.startsWith("xoxb-")) {
   [SLACK_BOT_TOKEN, SLACK_USER_TOKEN] = [SLACK_USER_TOKEN, SLACK_BOT_TOKEN]; // you pasted them the wrong way round
@@ -110,6 +111,13 @@ function alertOnce(key, text) {
   say(text);
 }
 
+// A lead is ONLY a message posted by the lead-alert app (AIBot / "New Lead Alert"). Messages from people are never claimed.
+function isLeadAlert(e) {
+  if (!e.bot_id) return false; // posted by a person, not an app
+  const names = [e.bot_profile && e.bot_profile.name, e.username].filter(Boolean).map((n) => String(n).toLowerCase());
+  return names.includes(LEAD_BOT_NAME) || /new lead alert/i.test(fullText(e));
+}
+
 function fullText(e) {
   const parts = [e.text, ...(e.attachments || []).flatMap((a) => [a.pretext, a.title, a.text, a.fallback])];
   return parts.filter(Boolean).join("\n");
@@ -198,6 +206,7 @@ async function claim(event) {
   if (!state.armed || !state.channels.includes(event.channel)) return;
   if (event.subtype && !["bot_message", "file_share"].includes(event.subtype)) return; // edits, joins, etc.
   if (event.user === CLAIM_USER_ID) return;
+  if (!isLeadAlert(event)) return; // only AIBot lead alerts, never normal messages
   if (event.thread_ts && event.thread_ts !== event.ts) return; // already a reply
   if (matcher && !matcher.test(fullText(event))) return;
   state.armed = false; // synchronous: guarantees only ONE lead is claimed
