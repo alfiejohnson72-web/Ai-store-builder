@@ -160,13 +160,13 @@ footer a:hover{color:var(--gold2)}
     </div>
     <div class="trust"><span>Fully insured</span><span>Same-day response</span><span>20-year insurance-backed guarantees</span><span>No hidden costs</span></div>
   </div>
-  <form class="quote" id="quote" onsubmit="event.preventDefault();this.innerHTML='<h3>Thank you!</h3><p>We have your details and will be in touch within 2 hours.</p>'">
+  <form class="quote" id="quote">
     <h3>Request a free quote</h3><p>Takes 30 seconds. We reply within 2 hours.</p>
-    <input required placeholder="Full name" autocomplete="name">
-    <input required type="tel" placeholder="Phone number" autocomplete="tel">
-    <input type="text" placeholder="Postcode" autocomplete="postal-code">
-    <select><option>What do you need?</option><option>Roof repair</option><option>Full re-roof</option><option>Polyroof GRP flat roof</option><option>Warm roof</option><option>Tiling &amp; slating</option><option>Leadwork</option><option>Felt roof</option><option>Spray foam insulation removal</option><option>Balustrades, balconies &amp; terraces</option><option>Emergency leak</option><option>Other</option></select>
-    <textarea rows="3" placeholder="Tell us about the job (optional)"></textarea>
+    <input required name="name" placeholder="Full name" autocomplete="name">
+    <input required name="phone" type="tel" placeholder="Phone number" autocomplete="tel">
+    <input name="postcode" type="text" placeholder="Postcode" autocomplete="postal-code">
+    <select name="service"><option value="">What do you need?</option><option>Roof repair</option><option>Full re-roof</option><option>Polyroof GRP flat roof</option><option>Warm roof</option><option>Tiling &amp; slating</option><option>Leadwork</option><option>Felt roof</option><option>Spray foam insulation removal</option><option>Balustrades, balconies &amp; terraces</option><option>Emergency leak</option><option>Other</option></select>
+    <textarea name="details" rows="3" placeholder="Tell us about the job (optional)"></textarea>
     <button class="btn btn-gold" type="submit">Send My Request →</button>
   </form>
 </div>
@@ -266,6 +266,24 @@ footer a:hover{color:var(--gold2)}
 <script>
 const io=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}}),{threshold:.12});
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+// Quote form. Demo mode opens the visitor's email app pre-filled to the business.
+// For go-live, set FORM_ENDPOINT to a form service URL (e.g. Formspree) to send in the background.
+const FORM_ENDPOINT='';
+const QUOTE_EMAIL='GQroofing@hotmail.com';
+const qf=document.getElementById('quote');
+qf.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const d=Object.fromEntries(new FormData(qf));
+  const body=`Name: ${d.name}\nPhone: ${d.phone}\nPostcode: ${d.postcode||'-'}\nService: ${d.service||'-'}\n\n${d.details||''}`;
+  const thanks='<h3>Thank you!</h3><p>We have your details and will be in touch within 2 hours.</p>';
+  if(FORM_ENDPOINT){
+    try{const r=await fetch(FORM_ENDPOINT,{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify(d)});
+      if(r.ok){qf.innerHTML=thanks;return}}catch(_){}
+  }
+  location.href=`mailto:${QUOTE_EMAIL}?subject=${encodeURIComponent('Quote request – '+(d.service||'Roofing'))}&body=${encodeURIComponent(body)}`;
+  qf.innerHTML=thanks;
+});
 </script>
 </body>
 </html>
