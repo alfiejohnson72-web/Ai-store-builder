@@ -1,6 +1,6 @@
 // Zero-dependency Slack lead claimer: Socket Mode over WebSocket + Web API over fetch.
 // Press On in Bot Control -> claims the NEXT lead in watched channels with a lowercase "t" (as you),
-// lands the reply ~1200-1400ms after the lead, then turns itself off.
+// replies the instant the lead arrives (INSTANT mode), then turns itself off.
 const fs = require("node:fs");
 const path = require("node:path");
 
@@ -27,7 +27,8 @@ if (!/^[CG][A-Z0-9]+$/.test(CONTROL_CHANNEL)) problems.push("CONTROL_CHANNEL mus
 if (problems.length) throw new Error("Fix your .env file:\n - " + problems.join("\n - "));
 
 const CLAIM_TEXT = "t"; // the reply is always exactly "t"
-const MIN_MS = 1200, MAX_MS = 1400, TARGET_MS = 1300; // reply must land this long after the lead
+const INSTANT = true; // reply the moment the lead arrives: no delay, no checks in the way
+const MIN_MS = 700, MAX_MS = 900, TARGET_MS = 800; // only used when INSTANT is false
 const matcher = CLAIM_MATCH ? new RegExp(CLAIM_MATCH, "i") : null;
 const log = (...a) => console.log(new Date().toLocaleTimeString(), ...a);
 
@@ -223,34 +224,37 @@ async function claim(event) {
   if (event.thread_ts && event.thread_ts !== event.ts) return; // already a reply
   if (matcher && !matcher.test(fullText(event))) return;
   state.armed = false; // synchronous: guarantees only ONE lead is claimed
-  save();
-
-  // While we wait for the timing window, check nobody (e.g. a second copy of this bot) already replied as you.
-  const alreadyClaimed = slack("conversations.replies", SLACK_USER_TOKEN, { channel: event.channel, ts: event.ts, limit: 20 }, 3000)
-    .then((r) => (r.messages || []).some((m) => m.ts !== event.ts && m.user === CLAIM_USER_ID))
-    .catch(() => false);
-
-  // Wait until the reply will LAND TARGET_MS after the lead, by Slack's clock (bounded, so a bad clock can't stall us).
   const leadMs = Number(event.ts) * 1000;
-  const wait = Math.max(0, Math.min(1700, leadMs + TARGET_MS + corr - (Date.now() + clockOffset)));
-  await new Promise((r) => setTimeout(r, wait));
+
+  // Instant mode: fire the reply right now. Nothing is awaited before it.
+  // Timed mode (INSTANT = false): wait so the reply lands TARGET_MS after the lead, by Slack's clock.
+  let alreadyClaimed = Promise.resolve(false);
+  if (!INSTANT) {
+    alreadyClaimed = slack("conversations.replies", SLACK_USER_TOKEN, { channel: event.channel, ts: event.ts, limit: 20 }, 3000)
+      .then((r) => (r.messages || []).some((m) => m.ts !== event.ts && m.user === CLAIM_USER_ID))
+      .catch(() => false);
+    const wait = Math.max(0, Math.min(1700, leadMs + TARGET_MS + corr - (Date.now() + clockOffset)));
+    await new Promise((r) => setTimeout(r, wait));
+  }
+  const firstReply = INSTANT ? postWithRetry(event) : null; // already in flight
+  save(); // the disk write happens while the reply is on its way
 
   try {
-    if (await alreadyClaimed) {
+    if (!INSTANT && (await alreadyClaimed)) {
       await say(`ℹ️ Skipped: you already replied to that lead in <#${event.channel}>. Now OFF.`);
     } else {
-      const sent = await postWithRetry(event);
+      const sent = await (firstReply || postWithRetry(event));
       const actual = Math.round(Number(sent.ts) * 1000 - leadMs); // exact: Slack's own timestamps
-      if (Number.isFinite(actual) && sent.tries === 1 && Math.abs(actual - TARGET_MS) < 300) { // learn only from clean, first-try, non-spike claims
+      if (!INSTANT && Number.isFinite(actual) && sent.tries === 1 && Math.abs(actual - TARGET_MS) < 300) { // learn only from clean claims
         const step = Math.max(-100, Math.min(100, (actual - TARGET_MS) * 0.3));
         corr = Math.max(-600, Math.min(300, corr - step));
       }
-      const ok = actual >= MIN_MS && actual <= MAX_MS;
       if (!state.leadBotId && event.bot_id) { state.leadBotId = event.bot_id; save(); } // lock onto AIBot
       const count = pickReplyCount();
       sendFollowUps(event, count).catch((e) => log("follow-ups error:", e.message)); // runs in the background
+      const ok = INSTANT || (actual >= MIN_MS && actual <= MAX_MS);
       log(`Claimed ${event.channel} ${event.ts}: reply landed ${actual}ms after the lead (${count} t's)`);
-      await say(`${ok ? "✅" : "⚠️"} Claimed 1 lead in <#${event.channel}>: replied "${CLAIM_TEXT}" ${count > 1 ? `x${count} ` : ""}(first one ${actual}ms after it was posted)${ok ? "" : " (outside the 1200-1400ms window)"}. Now OFF.`);
+      await say(`${ok ? "⚡" : "⚠️"} Claimed 1 lead in <#${event.channel}>: replied "${CLAIM_TEXT}" ${count > 1 ? `x${count} ` : ""}(first one ${actual}ms after it was posted)${ok ? "" : " (outside the 700-900ms window)"}. Now OFF.`);
     }
   } catch (err) {
     state.armed = true; // failed: stay armed so the next lead is still claimed
@@ -312,7 +316,7 @@ function control(event) {
   } else if (cmd === "check") {
     after = selfCheck;
   } else if (cmd === "status") {
-    reply = `${state.armed ? "🟢 ON" : "🔴 OFF"} · reply "${CLAIM_TEXT}" at ${MIN_MS}-${MAX_MS}ms · watching: ${state.channels.map((c) => `<#${c}>`).join(", ") || "nothing yet"} · replies only to ${state.leadBotId ? "AIBot (locked to its app ID)" : "AIBot"}\nCommands: on, off, status, check, watch #channel, unwatch #channel, ignore @person, unignore @person, ignored`;
+    reply = `${state.armed ? "🟢 ON" : "🔴 OFF"} · reply "${CLAIM_TEXT}" ${INSTANT ? "INSTANT" : `at ${MIN_MS}-${MAX_MS}ms`} · watching: ${state.channels.map((c) => `<#${c}>`).join(", ") || "nothing yet"} · replies only to ${state.leadBotId ? "AIBot (locked to its app ID)" : "AIBot"}\nCommands: on, off, status, check, watch #channel, unwatch #channel, ignore @person, unignore @person, ignored`;
   } else {
     panel();
     return;
@@ -362,7 +366,7 @@ async function catchUp() {
 }
 every(() => catchUp().catch(() => {}), 1200);
 every(() => { if (state.armed) calibrate(); }, 180000); // keep the clock fresh while ON
-every(() => slack("auth.test", SLACK_USER_TOKEN, {}, 4000).catch(() => {}), 15000); // keep the connection warm: no slow handshake when a lead lands
+every(() => { if (state.armed) slack("auth.test", SLACK_USER_TOKEN, {}, 4000).catch(() => {}); }, 3000); // while ON: keep the connection to Slack warm so the reply never waits for a new handshake
 
 // While ON, re-check every 5 minutes that keys and channels still work, so a problem is reported BEFORE a lead arrives.
 async function readiness() {
