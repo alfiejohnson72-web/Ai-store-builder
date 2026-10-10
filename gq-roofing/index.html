@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GQ & Sons Roofing | Windsor, Slough, Ascot, Maidenhead, Surrey & London</title>
+<meta name="description" content="GQ & Sons Roofing & Building Ltd – family-run roofing specialists with 40+ years' experience across Windsor, Slough, Ascot, Maidenhead, Berkshire, Buckinghamshire, Surrey & London. Free quotes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"RoofingContractor","name":"GQ & Sons Roofing & Building Ltd","url":"https://gqroofing.co.uk/","telephone":"+441753851156","areaServed":["Windsor","Slough","Ascot","Maidenhead","Berkshire","Buckinghamshire","Surrey","London"],"priceRange":"££"}
+</script>
+<style>
+:root{
+  --ink:#0b1220;--navy:#0f1b33;--navy2:#16264a;--gold:#1f6fd1;--gold2:#6db0ff;
+  --bg:#fafaf7;--card:#fff;--mut:#5d667a;--line:#e6e8ee;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Inter,system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:'Playfair Display',Georgia,serif;line-height:1.15}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+section{padding:96px 0}
+.eyebrow{display:inline-block;color:var(--gold);font-weight:600;letter-spacing:.18em;text-transform:uppercase;font-size:.78rem;margin-bottom:14px}
+h2{font-size:clamp(2rem,4vw,3rem);margin-bottom:16px}
+.lead{color:var(--mut);max-width:620px;font-size:1.08rem}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:15px 28px;border-radius:999px;font-weight:600;font-size:.98rem;transition:.25s;cursor:pointer;border:0}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;box-shadow:0 10px 30px -10px rgba(31,111,209,.7)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 16px 36px -10px rgba(31,111,209,.9)}
+.btn-ghost{border:1.5px solid rgba(255,255,255,.4);color:#fff}
+.btn-ghost:hover{background:rgba(255,255,255,.1)}
+/* top bar + nav */
+.topbar{background:var(--ink);color:#c9d0e0;font-size:.82rem;padding:8px 0}
+.topbar .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.topbar b{color:var(--gold2)}
+header{position:sticky;top:0;z-index:50;background:rgba(15,27,51,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.08)}
+nav{display:flex;align-items:center;justify-content:space-between;height:74px}
+.logo{display:flex;align-items:center;gap:12px;color:#fff;font-family:'Playfair Display',serif;font-weight:800;font-size:1.45rem}
+.logo i{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--gold),var(--gold2));display:grid;place-items:center;color:#fff;font-style:normal;font-size:1rem}
+.logo small{display:block;font-family:Inter;font-weight:500;font-size:.62rem;letter-spacing:.3em;color:var(--gold2);margin-top:-4px}
+.links{display:flex;gap:30px;color:#d6dcec;font-size:.93rem;font-weight:500}
+.links a:hover{color:var(--gold2)}
+.nav-cta{padding:11px 22px;font-size:.9rem}
+@media(max-width:860px){.links{display:none}}
+/* hero */
+.hero{position:relative;color:#fff;padding:120px 0 0;background:
+  radial-gradient(900px 500px at 85% 10%,rgba(31,111,209,.22),transparent 60%),
+  linear-gradient(160deg,var(--navy),#08101f 70%);overflow:hidden}
+.hero:before{content:"";position:absolute;inset:0;opacity:.07;background-image:repeating-linear-gradient(135deg,#fff 0 1px,transparent 1px 38px)}
+.hero .wrap{position:relative;display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}
+.hero h1{font-size:clamp(2.6rem,6vw,4.6rem);margin:14px 0 22px}
+.hero h1 em{font-style:normal;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;color:transparent}
+.hero p.lead{color:#b9c3dc}
+.hero .btns{display:flex;gap:14px;flex-wrap:wrap;margin:34px 0}
+.trust{display:flex;gap:26px;flex-wrap:wrap;color:#c3cce3;font-size:.9rem;padding-bottom:70px}
+.trust span:before{content:"✓ ";color:var(--gold2);font-weight:700}
+.quote{background:#fff;color:var(--ink);border-radius:22px;padding:32px;box-shadow:0 40px 80px -30px rgba(0,0,0,.6);margin-bottom:70px}
+.quote h3{font-size:1.5rem;margin-bottom:4px}
+.quote p{color:var(--mut);font-size:.9rem;margin-bottom:18px}
+.quote input,.quote select,.quote textarea{width:100%;padding:13px 15px;border:1.5px solid var(--line);border-radius:12px;font:inherit;margin-bottom:12px;background:#fbfbfd}
+.quote input:focus,.quote select:focus,.quote textarea:focus{outline:0;border-color:var(--gold)}
+.quote .btn{width:100%;justify-content:center}
+@media(max-width:900px){.hero .wrap{grid-template-columns:1fr}}
+/* stats */
+.stats{background:var(--ink);color:#fff;padding:0}
+.stats .wrap{display:grid;grid-template-columns:repeat(4,1fr)}
+.stat{padding:42px 20px;text-align:center;border-right:1px solid rgba(255,255,255,.08)}
+.stat:last-child{border:0}
+.stat b{display:block;font-family:'Playfair Display',serif;font-size:2.6rem;color:var(--gold2)}
+.stat span{color:#a8b2cb;font-size:.9rem}
+@media(max-width:700px){.stats .wrap{grid-template-columns:1fr 1fr}.stat{border-bottom:1px solid rgba(255,255,255,.08)}}
+/* services */
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
+.svc{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:32px;transition:.3s;position:relative;overflow:hidden}
+.svc:hover{transform:translateY(-6px);box-shadow:0 30px 50px -28px rgba(15,27,51,.35);border-color:var(--gold)}
+.ico{width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,var(--navy),var(--navy2));display:grid;place-items:center;font-size:1.5rem;margin-bottom:20px}
+.svc h3{font-size:1.35rem;margin-bottom:8px}
+.svc p{color:var(--mut);font-size:.95rem}
+.svc a{display:inline-block;margin-top:16px;color:var(--gold);font-weight:600;font-size:.9rem}
+@media(max-width:900px){.grid3{grid-template-columns:1fr}}
+@media(min-width:620px) and (max-width:900px){.grid3{grid-template-columns:1fr 1fr}}
+/* why */
+.why{background:linear-gradient(180deg,#fff,#f1f2ee)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.visual{aspect-ratio:1/1.05;border-radius:26px;background:
+  linear-gradient(160deg,rgba(15,27,51,.2),rgba(15,27,51,.75)),
+  repeating-linear-gradient(135deg,#1b2d55 0 24px,#162649 24px 48px);position:relative;box-shadow:0 40px 70px -30px rgba(15,27,51,.6)}
+.visual .badge{position:absolute;left:24px;bottom:24px;right:24px;background:rgba(255,255,255,.96);border-radius:16px;padding:20px 22px;display:flex;gap:16px;align-items:center}
+.visual .badge b{font-family:'Playfair Display',serif;font-size:2.4rem;color:var(--gold)}
+.visual .tag{position:absolute;top:22px;left:22px;background:var(--gold);color:#fff;padding:6px 14px;border-radius:999px;font-weight:700;font-size:.75rem;letter-spacing:.08em}
+.feat{display:flex;gap:16px;margin-top:26px}
+.feat i{flex:0 0 44px;height:44px;border-radius:50%;background:rgba(31,111,209,.15);color:var(--gold);display:grid;place-items:center;font-style:normal;font-weight:700}
+.feat h4{font-size:1.08rem;margin-bottom:2px}
+.feat p{color:var(--mut);font-size:.94rem}
+@media(max-width:900px){.split{grid-template-columns:1fr}}
+/* process */
+.process{background:var(--navy);color:#fff}
+.process .lead{color:#aeb8d3}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:50px}
+.step{border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:28px;background:rgba(255,255,255,.03)}
+.step b{font-family:'Playfair Display',serif;font-size:2.6rem;color:var(--gold2);display:block;margin-bottom:6px}
+.step p{color:#a8b2cb;font-size:.93rem}
+@media(max-width:900px){.steps{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.steps{grid-template-columns:1fr}}
+/* reviews */
+.rev{background:#fff;border:1px solid var(--line);border-radius:20px;padding:30px}
+.stars{color:var(--gold);letter-spacing:3px;margin-bottom:12px}
+.rev p{font-size:.98rem;margin-bottom:18px}
+.rev small{color:var(--mut);font-weight:600}
+/* faq */
+details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 24px;margin-top:12px}
+summary{cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between}
+summary:after{content:"+";color:var(--gold);font-size:1.4rem;line-height:1}
+details[open] summary:after{content:"–"}
+details p{color:var(--mut);margin-top:12px}
+.faq{max-width:820px}
+/* cta */
+.cta{background:linear-gradient(135deg,var(--gold),var(--gold2));padding:80px 0;text-align:center;color:#fff}
+.cta h2{margin-bottom:12px}
+.cta .btn{background:var(--ink);color:#fff;margin-top:22px}
+footer{background:var(--ink);color:#99a3bd;padding:64px 0 28px;font-size:.92rem}
+.fgrid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:36px}
+footer h5{color:#fff;margin-bottom:14px;font-size:.95rem}
+footer li{list-style:none;margin-bottom:8px}
+footer a:hover{color:var(--gold2)}
+.copy{border-top:1px solid rgba(255,255,255,.08);margin-top:44px;padding-top:22px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:.82rem}
+@media(max-width:800px){.fgrid{grid-template-columns:1fr 1fr}}
+/* sticky call (mobile) */
+.callbar{display:none}
+@media(max-width:700px){.callbar{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:60}.callbar a{flex:1;text-align:center;padding:16px;font-weight:700}.callbar a:first-child{background:var(--ink);color:#fff}.callbar a:last-child{background:var(--gold);color:#fff}body{padding-bottom:54px}}
+.reveal{opacity:0;transform:translateY(24px);transition:.8s}
+.reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="wrap">
+  <span>🛡️ Fully insured · Guaranteed workmanship · <b>Free no-obligation quotes</b></span>
+  <span>24/7 Emergency Call-Out: <b>01753 851156</b></span>
+</div></div>
+
+<header><div class="wrap"><nav>
+  <a class="logo" href="#top"><i>GQ</i><span>GQ &amp; Sons<small>ROOFING &amp; BUILDING LTD</small></span></a>
+  <div class="links"><a href="#services">Services</a><a href="#why">Why Us</a><a href="#process">Process</a><a href="#reviews">Reviews</a><a href="#faq">FAQ</a></div>
+  <a class="btn btn-gold nav-cta" href="#quote">Free Quote</a>
+</nav></div></header>
+
+<main id="top">
+<div class="hero"><div class="wrap">
+  <div>
+    <span class="eyebrow">Family run · 40+ years · Windsor, Slough, Ascot, Maidenhead</span>
+    <h1>More than just a <em>roofing company.</em></h1>
+    <p class="lead">A family-owned business with over four decades of experience and a reputation for trust, reliability and exceptional craftsmanship — serving Windsor, Slough, Ascot, Maidenhead, Berkshire, Buckinghamshire, Surrey and London.</p>
+    <div class="btns">
+      <a class="btn btn-gold" href="#quote">Get My Free Quote →</a>
+      <a class="btn btn-ghost" href="tel:01753851156">📞 Call 01753 851156</a>
+    </div>
+    <div class="trust"><span>Fully insured</span><span>Same-day response</span><span>Written guarantee</span><span>No hidden costs</span></div>
+  </div>
+  <form class="quote" id="quote" onsubmit="event.preventDefault();this.innerHTML='<h3>Thank you!</h3><p>We have your details and will be in touch within 2 hours.</p>'">
+    <h3>Request a free quote</h3><p>Takes 30 seconds. We reply within 2 hours.</p>
+    <input required placeholder="Full name" autocomplete="name">
+    <input required type="tel" placeholder="Phone number" autocomplete="tel">
+    <input type="text" placeholder="Postcode" autocomplete="postal-code">
+    <select><option>What do you need?</option><option>Roof repair</option><option>Full re-roof</option><option>Flat roof</option><option>Guttering &amp; fascias</option><option>Emergency leak</option><option>Other</option></select>
+    <textarea rows="3" placeholder="Tell us about the job (optional)"></textarea>
+    <button class="btn btn-gold" type="submit">Send My Request →</button>
+  </form>
+</div>
+<div class="stats" style="margin-top:0"><div class="wrap">
+  <div class="stat"><b>40+</b><span>Years experience</span></div>
+  <div class="stat"><b>1000s</b><span>Roofs completed</span></div>
+  <div class="stat"><b>5.0★</b><span>Average rating</span></div>
+  <div class="stat"><b>24/7</b><span>Emergency cover</span></div>
+</div></div>
+</div>
+
+<section id="services"><div class="wrap">
+  <span class="eyebrow">What we do</span>
+  <h2>Complete roofing services</h2>
+  <p class="lead">One trusted team for every roofing need — residential and commercial.</p>
+  <div class="grid3">
+    <div class="svc reveal"><div class="ico">🏠</div><h3>Roof Replacement</h3><p>Full strip-and-re-roof using premium tiles, slate and membranes, installed to British Standards.</p><a href="#quote">Get a quote →</a></div>
+    <div class="svc reveal"><div class="ico">🔧</div><h3>Roof Repairs</h3><p>Leaks, slipped tiles, storm damage and flashing repairs — fixed fast and fixed properly.</p><a href="#quote">Get a quote →</a></div>
+    <div class="svc reveal"><div class="ico">▭</div><h3>Flat Roofing</h3><p>Durable GRP fibreglass, EPDM rubber and felt systems with long-term guarantees.</p><a href="#quote">Get a quote →</a></div>
+    <div class="svc reveal"><div class="ico">🧱</div><h3>Slate &amp; Tile</h3><p>Traditional and modern finishes, expertly laid and matched to your property.</p><a href="#quote">Get a quote →</a></div>
+    <div class="svc reveal"><div class="ico">💧</div><h3>Guttering &amp; Fascias</h3><p>UPVC and aluminium guttering, soffits and fascias that keep water where it belongs.</p><a href="#quote">Get a quote →</a></div>
+    <div class="svc reveal"><div class="ico">🚨</div><h3>Emergency Call-Out</h3><p>Leaking at 2am? We respond day and night to make you safe and weather-tight.</p><a href="tel:01753851156">Call now →</a></div>
+  </div>
+</div></section>
+
+<section class="why" id="why"><div class="wrap split">
+  <div class="visual reveal"><span class="tag">FAMILY RUN</span>
+    <div class="badge"><b>40+</b><div><strong>Years of family craftsmanship</strong><br><small style="color:#5d667a">Reputation built on trust &amp; reliability</small></div></div></div>
+  <div class="reveal">
+    <span class="eyebrow">Why GQ &amp; Sons</span>
+    <h2>The difference is in the detail</h2>
+    <p class="lead">We treat every roof like it's our own home.</p>
+    <div class="feat"><i>1</i><div><h4>Transparent, fixed pricing</h4><p>Itemised written quotes. The price we agree is the price you pay.</p></div></div>
+    <div class="feat"><i>2</i><div><h4>Skilled, vetted craftsmen</h4><p>Experienced, fully qualified roofers — never unknown subcontractors.</p></div></div>
+    <div class="feat"><i>3</i><div><h4>Clean, respectful sites</h4><p>We protect your property and leave it spotless.</p></div></div>
+    <div class="feat"><i>4</i><div><h4>Fully insured &amp; accredited</h4><p>Public liability cover and trade accreditations for total peace of mind.</p></div></div>
+  </div>
+</div></section>
+
+<section class="process" id="process"><div class="wrap">
+  <span class="eyebrow">How it works</span>
+  <h2>Simple from start to finish</h2>
+  <p class="lead">No stress, no surprises.</p>
+  <div class="steps">
+    <div class="step reveal"><b>01</b><h3>Get in touch</h3><p>Call or send the form. We reply within 2 hours.</p></div>
+    <div class="step reveal"><b>02</b><h3>Free survey</h3><p>We inspect your roof and explain exactly what's needed.</p></div>
+    <div class="step reveal"><b>03</b><h3>Fixed quote</h3><p>A clear written quote with no hidden extras.</p></div>
+    <div class="step reveal"><b>04</b><h3>Expert install</h3><p>Work completed on time, then signed off with your guarantee.</p></div>
+  </div>
+</div></section>
+
+<section id="reviews"><div class="wrap">
+  <span class="eyebrow">Customer reviews</span>
+  <h2>Trusted across Windsor, Slough &amp; beyond</h2>
+  <p class="lead">[Replace with real reviews from Google / Checkatrade]</p>
+  <div class="grid3">
+    <div class="rev reveal"><div class="stars">★★★★★</div><p>“Brilliant from first call to final clean-up. Roof looks fantastic and the price was exactly as quoted.”</p><small>— [Customer name], [Town]</small></div>
+    <div class="rev reveal"><div class="stars">★★★★★</div><p>“Came out the same day for a leak and sorted it fast. Professional, polite and tidy. Highly recommend.”</p><small>— [Customer name], [Town]</small></div>
+    <div class="rev reveal"><div class="stars">★★★★★</div><p>“Complete re-roof done in under a week. Couldn't be happier with the standard of work.”</p><small>— [Customer name], [Town]</small></div>
+  </div>
+</div></section>
+
+<section id="faq" style="background:#f1f2ee"><div class="wrap faq">
+  <span class="eyebrow">FAQ</span><h2>Common questions</h2>
+  <details><summary>Do you offer free quotes?</summary><p>Yes. Every survey and quote is completely free and with no obligation.</p></details>
+  <details><summary>How quickly can you start?</summary><p>Emergency repairs are attended same-day where possible. Larger projects are typically scheduled within a couple of weeks.</p></details>
+  <details><summary>Are you insured and guaranteed?</summary><p>Yes — fully insured, and all work carries a written workmanship guarantee.</p></details>
+  <details><summary>Which areas do you cover?</summary><p>Windsor, Slough, Ascot, Maidenhead and throughout Berkshire, Buckinghamshire, Surrey and London.</p></details>
+</div></section>
+
+<div class="cta"><div class="wrap">
+  <h2>Ready for a roof you can rely on?</h2>
+  <p>Get your free, no-obligation quote today.</p>
+  <a class="btn" href="#quote">Get My Free Quote →</a>
+</div></div>
+</main>
+
+<footer><div class="wrap">
+  <div class="fgrid">
+    <div><a class="logo" href="#top"><i>GQ</i><span>GQ &amp; Sons</span></a><p style="margin-top:14px">GQ &amp; Sons Roofing &amp; Building Ltd. Family-run roofing specialists with over 40 years' experience. Credit cards accepted.</p></div>
+    <div><h5>Services</h5><ul><li><a href="#services">Roof Replacement</a></li><li><a href="#services">Repairs</a></li><li><a href="#services">Flat Roofing</a></li><li><a href="#services">Guttering</a></li></ul></div>
+    <div><h5>Company</h5><ul><li><a href="#why">Why Us</a></li><li><a href="#process">Process</a></li><li><a href="#reviews">Reviews</a></li><li><a href="#faq">FAQ</a></li></ul></div>
+    <div><h5>Contact</h5><ul><li>01753 851156</li><li>07444 104104</li><li>07782 116084</li><li>Windsor, Slough, Ascot, Maidenhead, Surrey &amp; London</li></ul></div>
+  </div>
+  <div class="copy"><span>© 2026 GQ &amp; Sons Roofing &amp; Building Ltd. All rights reserved.</span><span>Concept design</span></div>
+</div></footer>
+
+<div class="callbar"><a href="tel:01753851156">📞 Call Now</a><a href="#quote">Free Quote</a></div>
+
+<script>
+const io=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}}),{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
