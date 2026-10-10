@@ -4,178 +4,377 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Used MINI Specialists in Holyport, Berkshire | Berkeley Cars</title>
-<meta name="description" content="Used MINIs, finance, servicing and MOT at The Forecourt, Holyport, Berkshire. Call 01628 778889. Viewings by appointment.">
+<meta name="description" content="Hand-picked used MINIs with HPI checks and a 3-month warranty, plus finance, servicing and MOT at The Forecourt, Holyport. Call 01628 778889.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  /* palette: racing green + warm cream, orange accent */
-  --green-950:#071a14; --green-900:#0b2a21; --green-800:#12392d; --green-700:#1c4d3c;
-  --cream:#f7f4ed; --cream-2:#ece6d8; --line:#ddd6c5; --white:#fff;
-  --ink:#16201b; --ink-2:#4a554f;
-  --orange:#f28c1e; --orange-hover:#d97706; --orange-text:#a84e00; --on-orange:#16201b;
-  --radius:10px; --s1:8px; --s2:16px; --s3:24px; --s4:40px; --s5:64px; --s6:96px; --max:1240px;
-  --font-head:"Oswald","Arial Narrow","Roboto Condensed",Impact,sans-serif;
-  --font-body:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --black:#0a0a0a; --panel:#141414; --panel-2:#1c1c1c; --line:#2c2c2c;
+  --white:#fff; --muted:#b9b9b9; --orange:#f7941d; --orange-hover:#ffa94a; --on-orange:#111;
+  --radius:12px; --max:1240px;
+  --s1:8px; --s2:16px; --s3:24px; --s4:40px; --s5:72px; --s6:104px;
+  --head:"Oswald","Arial Narrow",Impact,sans-serif;
+  --body:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{margin:0;background:var(--cream);color:var(--ink);font:16px/1.6 var(--font-body)}
-img,svg{max-width:100%;display:block}
-a{color:var(--orange-text)}
-h1,h2,h3{font-family:var(--font-head);text-transform:uppercase;line-height:1.1;margin:0 0 var(--s2);letter-spacing:.01em}
-h1{font-size:clamp(2.25rem,6vw,3.75rem);font-weight:700}
-h2{font-size:clamp(1.75rem,4vw,2.5rem);font-weight:600}
-h3{font-size:1.375rem;font-weight:600}
+body{margin:0;background:var(--black);color:var(--white);font:16px/1.65 var(--body);-webkit-font-smoothing:antialiased}
+img,svg{display:block;max-width:100%}
+a{color:var(--orange)}
+h1,h2,h3{font-family:var(--head);text-transform:uppercase;line-height:1.05;margin:0 0 var(--s2);letter-spacing:.015em;font-weight:600}
+h1{font-size:clamp(2.6rem,6.5vw,5rem);font-weight:700}
+h2{font-size:clamp(2rem,4.2vw,3rem)}
+h3{font-size:1.4rem}
+p{margin:0 0 var(--s2)}
 .wrap{max-width:var(--max);margin:0 auto;padding:0 var(--s2)}
 section{padding:var(--s5) 0}
-.lead{color:var(--ink-2);max-width:60ch}
-.skip{position:absolute;left:-999px;top:0;background:var(--orange);color:var(--on-orange);padding:var(--s1) var(--s2);z-index:100}
+.eyebrow{display:inline-block;font:600 .8rem var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--orange);margin-bottom:var(--s1)}
+.lead{color:var(--muted);font-size:1.1rem;max-width:58ch}
+.ico{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.skip{position:absolute;left:-999px;top:0;background:var(--orange);color:var(--on-orange);padding:var(--s1) var(--s2);z-index:200}
 .skip:focus{left:var(--s1);top:var(--s1)}
 :focus-visible{outline:3px solid var(--orange);outline-offset:3px}
 
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s1);min-height:48px;padding:0 var(--s3);
-  border-radius:var(--radius);border:2px solid var(--orange);background:var(--orange);color:var(--on-orange);
-  font:700 1rem var(--font-body);text-transform:uppercase;letter-spacing:.03em;text-decoration:none;cursor:pointer;transition:background .15s,transform .15s}
-.btn:hover{background:var(--orange-hover);border-color:var(--orange-hover);transform:translateY(-1px)}
-.btn--ghost{background:transparent;color:var(--ink);border-color:var(--green-800)}
-.btn--ghost:hover{background:var(--green-800);color:var(--white);border-color:var(--green-800)}
-.on-dark .btn--ghost,.hero .btn--ghost{color:var(--white);border-color:rgba(255,255,255,.7)}
-.hero .btn--ghost:hover{background:var(--white);color:var(--green-900);border-color:var(--white)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 28px;border-radius:999px;border:2px solid var(--orange);
+  background:var(--orange);color:var(--on-orange);font:700 .95rem var(--body);letter-spacing:.05em;text-transform:uppercase;text-decoration:none;cursor:pointer;transition:transform .15s,background .15s,box-shadow .15s}
+.btn:hover{background:var(--orange-hover);border-color:var(--orange-hover);transform:translateY(-2px);box-shadow:0 10px 24px rgba(247,148,29,.28)}
+.btn--ghost{background:transparent;color:var(--white);border-color:rgba(255,255,255,.55)}
+.btn--ghost:hover{background:var(--white);color:#000;border-color:var(--white);box-shadow:none}
+.btn--sm{min-height:44px;padding:0 20px;font-size:.85rem}
 
-.topbar{background:var(--green-950);font-size:.9rem;color:#e8efe9}
-.topbar .wrap{display:flex;gap:var(--s3);justify-content:flex-end;flex-wrap:wrap;padding-top:var(--s1);padding-bottom:var(--s1)}
-.topbar a{color:#e8efe9;text-decoration:none}
+/* top bar + header */
+.topbar{background:#000;border-bottom:1px solid var(--line);font-size:.85rem;color:var(--muted)}
+.topbar .wrap{display:flex;justify-content:space-between;gap:var(--s3);padding-top:10px;padding-bottom:10px;flex-wrap:wrap}
+.topbar .group{display:flex;gap:var(--s3);flex-wrap:wrap}
+.topbar a{color:var(--white);text-decoration:none}
 .topbar a:hover{color:var(--orange)}
-header.site{position:sticky;top:0;z-index:50;background:var(--green-900);border-bottom:3px solid var(--orange)}
-header.site .wrap{display:flex;align-items:center;justify-content:space-between;gap:var(--s2);min-height:76px}
-.logo{font-family:var(--font-head);text-transform:uppercase;text-decoration:none;color:var(--white);line-height:1}
-.logo b{display:block;font-size:1.75rem;letter-spacing:.02em}
-.logo span{display:block;color:var(--orange);font-size:1.05rem}
-nav ul{display:flex;gap:var(--s3);list-style:none;margin:0;padding:0}
-nav a{color:var(--white);text-decoration:none;font-family:var(--font-head);text-transform:uppercase;font-size:1.05rem;padding:12px 0;border-bottom:2px solid transparent}
+.topbar .t{display:flex;gap:8px;align-items:center}
+.topbar .ico{width:16px;height:16px;color:var(--orange)}
+header.site{position:sticky;top:0;z-index:100;background:rgba(10,10,10,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header.site .wrap{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);min-height:84px}
+.logo{font-family:var(--head);text-transform:uppercase;text-decoration:none;color:var(--white);line-height:.95}
+.logo b{display:block;font-size:2rem;letter-spacing:.01em;font-weight:600}
+.logo span{display:block;color:var(--orange);font-size:1.15rem;font-weight:500;letter-spacing:.02em}
+nav.main ul{display:flex;gap:var(--s3);list-style:none;margin:0;padding:0}
+nav a{color:var(--white);text-decoration:none;font:500 1.08rem var(--head);text-transform:uppercase;letter-spacing:.04em;padding:14px 0;border-bottom:2px solid transparent}
 nav a:hover,nav a[aria-current]{color:var(--orange);border-color:var(--orange)}
 .header-cta{display:flex;gap:var(--s1);align-items:center}
 .menu{display:none}
-.menu summary{list-style:none;cursor:pointer;min-height:48px;min-width:48px;display:grid;place-items:center;border:2px solid rgba(255,255,255,.7);color:var(--white);border-radius:var(--radius);font-family:var(--font-head);text-transform:uppercase;padding:0 var(--s2)}
+.menu summary{list-style:none;cursor:pointer;min-height:48px;min-width:48px;display:grid;place-items:center;border:2px solid rgba(255,255,255,.55);border-radius:999px;font:500 1rem var(--head);text-transform:uppercase;padding:0 var(--s2)}
 .menu summary::-webkit-details-marker{display:none}
-.menu ul{position:absolute;left:0;right:0;top:100%;background:var(--green-800);flex-direction:column;gap:0;padding:var(--s1) var(--s2) var(--s2)}
-.menu li a{display:block;padding:var(--s2) 0;border-bottom:1px solid rgba(255,255,255,.12)}
+.menu ul{position:absolute;left:0;right:0;top:100%;background:var(--panel);flex-direction:column;gap:0;padding:var(--s1) var(--s2) var(--s2);border-bottom:1px solid var(--line)}
+.menu li a{display:block;padding:var(--s2) 0;border-bottom:1px solid var(--line)}
 
-.hero{position:relative;padding:var(--s5) 0;color:var(--white);background:
-  radial-gradient(ellipse at 85% 20%,rgba(242,140,30,.18),transparent 55%),
-  linear-gradient(135deg,var(--green-900) 0%,var(--green-800) 60%,var(--green-700) 100%)}
-.hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:var(--s4);align-items:center}
-.hero p{font-size:1.15rem;color:#e3ece6;max-width:48ch}
-.hero .ph-note{font-size:.8rem;color:#a9bdb2;margin-top:var(--s2)}
-.cta-row{display:flex;gap:var(--s2);flex-wrap:wrap;margin-top:var(--s3)}
+/* hero */
+.hero{position:relative;padding:0;overflow:hidden;background:#000}
+.hero .bg{position:absolute;inset:0}
+.hero .bg img{width:100%;height:100%;object-fit:cover;object-position:65% 55%}
+.hero .bg::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#000 0%,rgba(0,0,0,.88) 32%,rgba(0,0,0,.35) 62%,rgba(0,0,0,.1) 100%),linear-gradient(0deg,#000 0%,transparent 28%)}
+.hero .wrap{position:relative;padding-top:var(--s6);padding-bottom:calc(var(--s6) + 70px)}
+.hero h1 em{font-style:normal;color:var(--orange)}
+.hero .lead{color:#e4e4e4;margin-bottom:var(--s3)}
+.cta-row{display:flex;gap:var(--s2);flex-wrap:wrap}
+.hero-points{display:flex;gap:var(--s3);flex-wrap:wrap;margin:var(--s4) 0 0;padding:0;list-style:none;color:#e4e4e4;font-size:.95rem}
+.hero-points li{display:flex;gap:8px;align-items:center}
+.hero-points .ico{width:20px;height:20px;color:var(--orange)}
 
-.finder{background:var(--white);color:var(--ink);border-radius:14px;padding:var(--s3);box-shadow:0 18px 50px rgba(0,0,0,.35)}
-.finder h2{font-size:1.5rem;color:var(--green-900)}
-.tabs{display:flex;flex-wrap:wrap;gap:var(--s1);margin-bottom:var(--s2)}
-.tabs>input[type=radio]{position:absolute;opacity:0}
-.tabs>label{flex:1;text-align:center;padding:var(--s1) var(--s2);border:2px solid var(--line);border-radius:var(--radius);cursor:pointer;font-weight:600;min-height:44px;display:grid;place-items:center;color:var(--ink-2)}
-.tabs>input:checked+label{border-color:var(--green-800);background:var(--green-800);color:var(--white)}
-.tabs>input:focus-visible+label{outline:3px solid var(--orange);outline-offset:2px}
-.panel{display:none}
-#t-budget:checked ~ .panels .p-budget,#t-vehicle:checked ~ .panels .p-vehicle{display:block}
-.field{margin-bottom:var(--s2)}
-.field label,.field legend{display:block;font-size:.9rem;color:var(--ink-2);margin-bottom:6px}
-select,input[type=range]{width:100%}
-select{min-height:48px;background:var(--cream);color:var(--ink);border:1px solid var(--line);border-radius:var(--radius);padding:0 var(--s2);font:inherit}
-input[type=range]{accent-color:var(--orange);height:32px;cursor:pointer}
-input[type=range]::-webkit-slider-runnable-track{height:10px;border-radius:999px;background:var(--cream-2)}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;margin-top:-9px;border-radius:50%;background:var(--orange);border:3px solid var(--white);box-shadow:0 0 0 2px var(--green-800),0 2px 6px rgba(0,0,0,.3)}
-.budget-out{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--font-head);font-size:1.5rem}
-.budget-out strong{color:var(--green-800);font-size:2.25rem}
-.finder .apr{font-size:.9rem;color:var(--ink-2);margin:var(--s1) 0 var(--s2)}
+/* finder bar overlapping hero */
+.finder-wrap{position:relative;z-index:5;margin-top:-70px}
+.finder{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:var(--s3);box-shadow:0 30px 70px rgba(0,0,0,.6);
+  display:grid;grid-template-columns:auto 1fr 1fr 1fr auto;gap:var(--s2);align-items:end}
+.finder .ttl{font:600 1.5rem var(--head);text-transform:uppercase;line-height:1.05;padding-right:var(--s2);border-right:1px solid var(--line);align-self:center}
+.finder .ttl small{display:block;font:500 .8rem var(--body);color:var(--muted);text-transform:none;letter-spacing:0;margin-top:4px}
+.field label{display:block;font-size:.78rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+select{width:100%;min-height:52px;background:var(--panel-2);color:var(--white);border:1px solid #3a3a3a;border-radius:10px;padding:0 var(--s2);font:inherit}
+select:hover{border-color:var(--orange)}
+.finder .btn{min-height:52px}
 
-.strip{background:var(--orange);color:var(--on-orange);padding:var(--s3) 0}
-.strip ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s2);font-weight:700;text-transform:uppercase;font-size:.95rem}
-.strip li{display:flex;gap:var(--s1);align-items:center}
-.strip li::before{content:"\2713";display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--green-900);color:var(--white);font-size:.8rem;flex:none}
+/* trust */
+.trust{padding:var(--s4) 0 0}
+.trust ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s2)}
+.trust li{display:flex;gap:14px;align-items:center;padding:var(--s2) var(--s3);background:var(--panel);border:1px solid var(--line);border-radius:var(--radius)}
+.trust .ico{width:34px;height:34px;color:var(--orange)}
+.trust strong{display:block;font:600 1.1rem var(--head);text-transform:uppercase;letter-spacing:.03em;line-height:1.1}
+.trust span{font-size:.85rem;color:var(--muted)}
 
-.section-head{display:flex;justify-content:space-between;align-items:end;gap:var(--s2);flex-wrap:wrap;margin-bottom:var(--s3)}
-.section-head h2,.reviews h2,.services h2{color:var(--green-900)}
+/* stock */
+.head-row{display:flex;justify-content:space-between;align-items:end;gap:var(--s3);flex-wrap:wrap;margin-bottom:var(--s4)}
+.head-row h2{margin:0}
 .grid{display:grid;gap:var(--s3);grid-template-columns:repeat(3,1fr)}
-.card{background:var(--white);border-radius:14px;overflow:hidden;border:1px solid var(--line);display:flex;flex-direction:column;box-shadow:0 2px 10px rgba(11,42,33,.06);transition:box-shadow .2s,transform .2s}
-.card:hover{box-shadow:0 12px 30px rgba(11,42,33,.16);transform:translateY(-3px)}
-.card .photo{aspect-ratio:4/3;background:repeating-linear-gradient(45deg,#e9e3d4 0 12px,#e2dbc9 12px 24px);display:grid;place-items:center;color:var(--ink-2);font-size:.85rem;position:relative}
-.ribbon{position:absolute;top:var(--s2);right:var(--s2);background:var(--green-800);color:var(--white);font-size:.75rem;font-weight:800;padding:4px 10px;border-radius:999px;text-transform:uppercase}
-.card .body{padding:var(--s3);display:flex;flex-direction:column;gap:var(--s2);flex:1}
-.card h3{margin:0;color:var(--green-900)}
-.card .sub{color:var(--ink-2);font-size:.95rem;margin:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:transform .25s,border-color .25s,box-shadow .25s}
+.card:hover{transform:translateY(-6px);border-color:var(--orange);box-shadow:0 22px 50px rgba(0,0,0,.55)}
+.card .photo{position:relative;aspect-ratio:4/3;overflow:hidden;background:#111}
+.card .photo img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.card:hover .photo img{transform:scale(1.05)}
+.tag{position:absolute;top:14px;left:14px;background:var(--orange);color:var(--on-orange);font:700 .72rem var(--body);letter-spacing:.08em;text-transform:uppercase;padding:6px 12px;border-radius:999px}
+.card .body{padding:var(--s3);display:flex;flex-direction:column;gap:12px;flex:1}
+.card h3{margin:0}
+.card h3 b{font-weight:700}
+.card .sub{margin:0;color:var(--muted);font-size:.92rem;line-height:1.45}
 .chips{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:0;padding:0}
-.chips li{background:var(--cream);border:1px solid var(--line);border-radius:6px;padding:4px 10px;font-size:.85rem}
-.price{display:flex;gap:var(--s3);align-items:baseline;margin-top:auto;padding-top:var(--s2);border-top:1px solid var(--line)}
-.price small{display:block;font-size:.7rem;color:var(--ink-2);text-transform:uppercase;letter-spacing:.06em}
-.price strong{font-family:var(--font-head);font-size:1.75rem;color:var(--ink)}
-.price .pm strong{color:var(--green-700)}
+.chips li{background:var(--panel-2);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:.82rem}
+.price{display:flex;gap:var(--s3);align-items:flex-end;margin-top:auto;padding-top:var(--s2);border-top:1px solid var(--line)}
+.price small{display:block;font:600 .68rem var(--body);color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
+.price strong{font:600 2rem/1.1 var(--head)}
+.price .pm strong{color:var(--orange)}
+.price .btn{margin-left:auto}
+.card.cta{justify-content:center;align-items:flex-start;padding:var(--s4);background:linear-gradient(160deg,#1f1405,var(--panel) 70%);border-color:#4a3210}
+.card.cta p{color:var(--muted)}
+.dlist{display:flex;flex-direction:column;gap:6px;margin:0 0 var(--s3);padding:0;list-style:none}
+.dlist li{display:flex;gap:10px;align-items:center}
+.dlist .ico{width:18px;height:18px;color:var(--orange)}
+.sample{font-size:.8rem;color:var(--muted);margin-top:var(--s3)}
 
-.services{background:var(--cream-2)}
-.svc{display:grid;gap:var(--s3);grid-template-columns:repeat(3,1fr)}
-.svc article{background:var(--white);border:1px solid var(--line);border-top:4px solid var(--orange);border-radius:14px;padding:var(--s4) var(--s3);display:flex;flex-direction:column;gap:var(--s2)}
-.svc h3{color:var(--green-900)}
-.svc .icon{width:48px;height:48px;border-radius:50%;background:var(--green-800);display:grid;place-items:center;color:var(--white);font-weight:800}
-.svc p{margin:0;color:var(--ink-2)}
-.svc .btn{margin-top:auto;align-self:flex-start}
+/* finance split */
+.split{background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.split .wrap{display:grid;grid-template-columns:1.05fr 1fr;gap:var(--s5);align-items:center}
+.split .pic{position:relative;border-radius:20px;overflow:hidden;aspect-ratio:4/3;border:1px solid var(--line)}
+.split .pic img{width:100%;height:100%;object-fit:cover}
+.split .pic::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.35),transparent 50%)}
+.budget{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:var(--s3) 0}
+.budget a{display:grid;place-items:center;min-height:52px;border-radius:10px;border:1px solid #3a3a3a;background:var(--panel-2);color:var(--white);text-decoration:none;font-weight:600;font-size:.9rem}
+.budget a:hover{border-color:var(--orange);color:var(--orange)}
+.apr{display:flex;gap:12px;align-items:flex-start;background:rgba(247,148,29,.08);border:1px solid rgba(247,148,29,.35);border-radius:10px;padding:14px 16px;font-size:.92rem;color:#e8e8e8;margin-bottom:var(--s3)}
+.apr .ico{color:var(--orange);width:22px;height:22px;margin-top:2px}
 
-.reviews .wrap{display:grid;grid-template-columns:1fr 1.4fr;gap:var(--s4);align-items:center}
-.quote{background:var(--green-900);color:var(--white);border-radius:14px;padding:var(--s4);border-left:6px solid var(--orange)}
-.quote p{font-style:italic;font-size:1.15rem;margin:0 0 var(--s2)}
-.stars{color:var(--orange);letter-spacing:3px;font-size:1.25rem}
-.badges{display:flex;gap:var(--s1);flex-wrap:wrap;margin-top:var(--s2)}
-.badge{border:1px dashed #8a8f86;border-radius:999px;padding:6px 14px;font-size:.85rem;color:var(--ink-2)}
+/* why */
+.why .cols{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4);margin-top:var(--s4)}
+.why .col{border-top:3px solid var(--orange);padding-top:var(--s3)}
+.why .num{font:700 3.2rem/1 var(--head);color:var(--orange);display:block;margin-bottom:var(--s1)}
+.why p{color:var(--muted)}
+.strip-photo{margin:var(--s5) 0 0;border-radius:18px;overflow:hidden;position:relative;border:1px solid var(--line)}
+.strip-photo img{width:100%;height:260px;object-fit:cover;object-position:50% 60%}
+.strip-photo figcaption{position:absolute;left:var(--s3);bottom:var(--s3);background:rgba(0,0,0,.75);padding:10px 16px;border-radius:999px;font-size:.9rem}
 
-.contact{background:var(--green-900);color:var(--white)}
-.contact .wrap{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--s4)}
-.contact h2{font-size:1.5rem;border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:var(--s1)}
-.contact a{color:var(--orange)}
-address{font-style:normal;line-height:1.8}
+/* services */
+.services{background:var(--panel);border-top:1px solid var(--line)}
+.svc{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s3);margin-top:var(--s4)}
+.svc article{background:var(--black);border:1px solid var(--line);border-radius:16px;padding:var(--s4) var(--s3);display:flex;flex-direction:column;gap:12px;transition:border-color .2s,transform .2s}
+.svc article:hover{border-color:var(--orange);transform:translateY(-4px)}
+.svc .ic{width:56px;height:56px;border-radius:14px;background:rgba(247,148,29,.12);display:grid;place-items:center;color:var(--orange)}
+.svc p{margin:0;color:var(--muted);font-size:.95rem}
+.svc a.more{margin-top:auto;font-weight:600;text-decoration:none;display:inline-flex;gap:8px;align-items:center}
+.svc a.more:hover{text-decoration:underline}
+
+/* reviews */
+.reviews .wrap{display:grid;grid-template-columns:1fr 1.5fr;gap:var(--s5);align-items:center}
+.quote{margin:0;background:#fff;color:#111;border-radius:20px;padding:var(--s4);position:relative}
+.quote::before{content:"\201C";position:absolute;top:8px;right:28px;font:700 7rem/1 var(--head);color:var(--orange);opacity:.9}
+.stars{color:#c46a00;letter-spacing:4px;font-size:1.3rem;margin-bottom:var(--s2)}
+.quote p{font-size:1.2rem;font-style:italic;max-width:52ch}
+.quote figcaption{font-weight:700}
+.badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:var(--s3)}
+.badge{border:1px dashed #666;border-radius:999px;padding:8px 16px;font-size:.85rem;color:var(--muted)}
+
+/* visit */
+.visit{background:var(--panel);border-top:1px solid var(--line)}
+.visit .wrap{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:var(--s4)}
+.map{border-radius:18px;border:1px solid var(--line);min-height:340px;background:
+  repeating-linear-gradient(0deg,#171717 0 38px,#1b1b1b 38px 40px),repeating-linear-gradient(90deg,#171717 0 38px,#1b1b1b 38px 40px);
+  display:grid;place-items:center;text-align:center;color:var(--muted);padding:var(--s3)}
+.map .pin{width:44px;height:44px;color:var(--orange);margin:0 auto 10px}
+.visit h2{font-size:1.6rem;margin-bottom:var(--s2)}
+address{font-style:normal;line-height:1.9;margin-bottom:var(--s2)}
+.big{display:flex;gap:12px;align-items:center;font:600 1.9rem var(--head);color:var(--white);text-decoration:none;margin-bottom:6px}
+.big .ico{color:var(--orange)}
+.big:hover{color:var(--orange)}
 .hours{width:100%;border-collapse:collapse}
-.hours th,.hours td{padding:6px 0;border-bottom:1px solid rgba(255,255,255,.14);text-align:left;font-weight:400}
+.hours th,.hours td{padding:9px 0;border-bottom:1px solid var(--line);text-align:left;font-weight:400}
 .hours td{text-align:right}
-.contact .big{font-family:var(--font-head);font-size:1.75rem;color:var(--white);text-decoration:none;display:block}
-.contact .big:hover{color:var(--orange)}
-.note{color:#bcd0c5;font-size:.9rem}
+.note{color:var(--muted);font-size:.9rem;margin-top:var(--s2)}
 
-footer{background:var(--green-950);padding:var(--s4) 0;font-size:.9rem;color:#a9bdb2}
-footer .wrap{display:flex;justify-content:space-between;gap:var(--s3);flex-wrap:wrap}
+footer{background:#000;border-top:1px solid var(--line);padding:var(--s4) 0 var(--s5);font-size:.9rem;color:var(--muted)}
+footer .wrap{display:flex;justify-content:space-between;gap:var(--s3);flex-wrap:wrap;align-items:center}
 footer ul{list-style:none;display:flex;gap:var(--s3);margin:0;padding:0;flex-wrap:wrap}
-footer a{color:#e3ece6}
+footer a{color:var(--white)}
 
-.mockup-banner{background:#fff3cd;color:#4a3b00;font-size:.85rem;padding:var(--s1) var(--s2);text-align:center}
+.mockup-banner{background:var(--orange);color:#111;font-size:.82rem;font-weight:600;padding:8px var(--s2);text-align:center}
 
+.callbar{display:none}
+
+@media (max-width:1100px){
+  .finder{grid-template-columns:1fr 1fr}
+  .finder .ttl{grid-column:1/-1;border-right:0;padding:0}
+  .finder .btn{grid-column:1/-1}
+  .svc{grid-template-columns:1fr 1fr}
+}
 @media (max-width:1023px){
-  .hero .wrap,.reviews .wrap,.contact .wrap{grid-template-columns:1fr}
-  .grid,.svc{grid-template-columns:1fr 1fr}
-  .strip ul{grid-template-columns:1fr 1fr}
   nav.main ul{display:none}
   .menu{display:block}
   header.site .wrap{position:relative}
+  .grid{grid-template-columns:1fr 1fr}
+  .split .wrap,.reviews .wrap,.visit .wrap{grid-template-columns:1fr}
+  .trust ul{grid-template-columns:1fr 1fr}
+  .why .cols{grid-template-columns:1fr}
+  .hero .bg::after{background:linear-gradient(0deg,#000 0%,rgba(0,0,0,.7) 55%,rgba(0,0,0,.45) 100%)}
 }
 @media (max-width:639px){
   section{padding:var(--s4) 0}
-  .grid,.svc{grid-template-columns:1fr}
-  .topbar .wrap{justify-content:space-between}
-  .topbar .addr{display:none}
-  .header-cta .btn--call-text{display:none}
-  .logo b{font-size:1.1rem;white-space:nowrap}.logo span{font-size:.85rem}
-  .header-cta .btn{padding:0 var(--s2)}
-  .menu summary{padding:0 var(--s1)}
+  .topbar .group.addr{display:none}
+  .topbar .wrap{justify-content:center}
+  .header-cta .btn{display:none}
+  .logo b{font-size:1.45rem;white-space:nowrap}.logo span{font-size:.95rem}
+  .hero .wrap{padding-top:var(--s5);padding-bottom:calc(var(--s5) + 70px)}
   .cta-row .btn{flex:1 1 100%}
+  .finder{grid-template-columns:1fr}
+  .grid,.svc,.trust ul{grid-template-columns:1fr}
+  .budget{grid-template-columns:1fr 1fr}
+  .price .btn{margin-left:0;width:100%}
+  .price{flex-wrap:wrap}
+  body{padding-bottom:72px}
+  .callbar{display:grid;grid-template-columns:1fr 1fr;gap:1px;position:fixed;left:0;right:0;bottom:0;z-index:150;background:var(--line);border-top:1px solid var(--line)}
+  .callbar a{display:flex;gap:8px;align-items:center;justify-content:center;min-height:64px;background:#000;color:var(--white);font:700 .9rem var(--body);text-transform:uppercase;letter-spacing:.05em;text-decoration:none}
+  .callbar a:first-child{background:var(--orange);color:var(--on-orange)}
 }
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.btn,.card{transition:none}.btn:hover,.card:hover{transform:none}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+
+/* ===== advanced features ===== */
+.topbar .open{color:var(--white)}
+.topbar .open .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#7a7a7a;margin-right:2px}
+.topbar .open.is-open .dot{background:#3ddc84;box-shadow:0 0 0 4px rgba(61,220,132,.2)}
+.shortlist-btn{position:relative;width:48px;height:48px;border-radius:50%;border:2px solid rgba(255,255,255,.55);background:transparent;color:var(--white);cursor:pointer;display:grid;place-items:center}
+.shortlist-btn:hover{border-color:var(--orange);color:var(--orange)}
+.shortlist-btn .count{position:absolute;top:-6px;right:-6px;min-width:22px;height:22px;border-radius:999px;background:var(--orange);color:#111;font:700 .75rem/22px var(--body);text-align:center;padding:0 5px}
+.toolbar{display:flex;gap:var(--s3);align-items:end;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:var(--s2) var(--s3);margin-bottom:var(--s3)}
+.chips-filter{display:flex;gap:8px;flex-wrap:wrap}
+.chips-filter button{min-height:44px;padding:0 18px;border-radius:999px;border:1px solid #3a3a3a;background:var(--panel-2);color:var(--white);font:600 .9rem var(--body);cursor:pointer}
+.chips-filter button[aria-pressed=true]{background:var(--orange);border-color:var(--orange);color:#111}
+.rng,.sort{display:flex;flex-direction:column;gap:6px;font-size:.78rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);min-width:170px}
+.rng b{color:var(--orange);letter-spacing:0;margin-left:6px;font-size:.95rem}
+.rng input{accent-color:var(--orange);width:100%;height:32px;cursor:pointer}
+.sort select{min-height:44px;font-size:.9rem}
+.count-note{margin:0;color:var(--muted)}
+.count-note b{color:var(--white)}
+.card .heart{position:absolute;top:12px;right:12px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);color:#fff;cursor:pointer;display:grid;place-items:center;transition:transform .15s}
+.card .heart:hover{transform:scale(1.1)}
+.card .heart[aria-pressed=true]{background:var(--orange);color:#111}
+.card .heart[aria-pressed=true] .ico{fill:currentColor}
+.card .noimg{width:100%;height:100%;display:grid;place-items:center;color:#555;background:repeating-linear-gradient(45deg,#181818 0 14px,#1d1d1d 14px 28px)}
+.card .noimg .ico{width:64px;height:64px}
+.card .actions{display:flex;gap:8px}
+.card .actions .btn{flex:1}
+.tag.sample{background:#fff;color:#111;left:auto;right:auto;top:auto;bottom:12px;left:14px}
+.empty{text-align:center;padding:var(--s5) var(--s3);border:1px dashed var(--line);border-radius:16px}
+.empty p{color:var(--muted)}
+.calc{background:var(--black);border:1px solid var(--line);border-radius:18px;padding:var(--s3);margin:var(--s3) 0;display:grid;gap:var(--s2)}
+.calc label,.px-form label,#bookForm label{display:flex;flex-direction:column;gap:6px;font-size:.78rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.calc input[type=range]{accent-color:var(--orange);height:32px;width:100%;cursor:pointer}
+.calc-out{display:flex;align-items:baseline;gap:10px}
+.calc-out small{font:600 .75rem var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-right:auto}
+.calc-out strong{font:700 3rem/1 var(--head);color:var(--orange)}
+.calc-out span{color:var(--muted)}
+.calc-row,.two{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2)}
+.calc-result{display:flex;justify-content:space-between;align-items:baseline;padding:var(--s2);background:var(--panel);border:1px solid var(--line);border-radius:12px}
+.calc-result span{color:var(--muted)}
+.calc-result strong{font:600 2rem var(--head)}
+input:not([type=range]):not([type=radio]),textarea{width:100%;min-height:52px;background:var(--panel-2);color:var(--white);border:1px solid #3a3a3a;border-radius:10px;padding:0 var(--s2);font:inherit;text-transform:none;letter-spacing:0;font-weight:400}
+textarea{padding:12px var(--s2);resize:vertical}
+input:focus-visible,textarea:focus-visible,select:focus-visible{border-color:var(--orange)}
+input[aria-invalid=true],select[aria-invalid=true]{border-color:#ff6b5e}
+.px{border-top:1px solid var(--line)}
+.px .wrap{display:grid;grid-template-columns:1fr 1fr;gap:var(--s5);align-items:center}
+.px-form{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:var(--s4);display:grid;gap:var(--s2)}
+.plate{display:flex;align-items:stretch;border-radius:10px;overflow:hidden;border:2px solid #111;background:#f6d200;max-width:420px}
+.plate .gb{background:#0a3fa8;color:#fff;font:700 .8rem var(--body);display:grid;place-items:end center;padding:6px 8px;width:44px}
+.plate input{background:transparent!important;color:#111!important;border:0!important;font:700 2rem var(--head)!important;text-transform:uppercase!important;letter-spacing:.08em!important;text-align:center;min-height:64px!important;border-radius:0!important}
+.plate input::placeholder{color:rgba(0,0,0,.35)}
+.form-msg{margin:0;padding:12px 14px;border-radius:10px;background:rgba(61,220,132,.12);border:1px solid rgba(61,220,132,.45);color:#c9f5da}
+.form-msg.err{background:rgba(255,107,94,.1);border-color:rgba(255,107,94,.5);color:#ffd2cd}
+.faq{background:var(--panel);border-top:1px solid var(--line)}
+.faq .wrap{display:grid;grid-template-columns:1fr 1.6fr;gap:var(--s5)}
+.faq-list details{border-bottom:1px solid var(--line)}
+.faq-list summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:var(--s2);padding:20px 0;font:600 1.15rem var(--head);text-transform:uppercase;letter-spacing:.03em}
+.faq-list summary::-webkit-details-marker{display:none}
+.faq-list summary .ico{color:var(--orange);transition:transform .25s}
+.faq-list details[open] summary .ico{transform:rotate(45deg)}
+.faq-list p{color:var(--muted);padding:0 0 20px;max-width:62ch;margin:0}
+.slider{position:relative;overflow:hidden;padding-bottom:2px}
+.slides{display:grid}
+.slide{grid-area:1/1;opacity:0;visibility:hidden;transition:opacity .5s,transform .5s;transform:translateX(24px)}
+.slide.on{opacity:1;visibility:visible;transform:none}
+.slider-ctl{display:flex;align-items:center;gap:var(--s2);margin-top:var(--s2)}
+.slider-ctl button{width:48px;height:48px;border-radius:50%;border:1px solid #3a3a3a;background:var(--panel-2);color:#fff;cursor:pointer;display:grid;place-items:center}
+.slider-ctl button:hover{border-color:var(--orange);color:var(--orange)}
+.dots{display:flex;gap:8px;margin-right:auto}
+.dots i{width:10px;height:10px;border-radius:50%;background:#444;display:block}
+.dots i.on{background:var(--orange);width:28px;border-radius:999px}
+dialog{background:var(--panel);color:var(--white);border:1px solid var(--line);border-radius:20px;padding:0;width:min(560px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto}
+dialog::backdrop{background:rgba(0,0,0,.75);backdrop-filter:blur(3px)}
+dialog>form:not(.dlg-head),dialog>div{padding:var(--s3)}
+.dlg-head{display:flex;justify-content:space-between;align-items:center;padding:var(--s3) var(--s3) 0}
+.dlg-head h2{margin:0;font-size:1.8rem}
+.x{width:44px;height:44px;border-radius:50%;border:1px solid #3a3a3a;background:var(--panel-2);color:#fff;cursor:pointer;display:grid;place-items:center}
+#bookForm{display:grid;gap:var(--s2)}
+.types{border:0;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:8px}
+.types legend{font-size:.78rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;padding:0}
+.types label{flex-direction:row;display:block}
+.types input{position:absolute;opacity:0}
+.types span{display:block;padding:10px 16px;border-radius:999px;border:1px solid #3a3a3a;background:var(--panel-2);font:600 .88rem var(--body);letter-spacing:0;text-transform:none;color:var(--white);cursor:pointer}
+.types input:checked+span{background:var(--orange);border-color:var(--orange);color:#111}
+.types input:focus-visible+span{outline:3px solid var(--orange);outline-offset:2px}
+.for-car{margin:0;padding:10px 14px;border-radius:10px;background:rgba(247,148,29,.1);border:1px solid rgba(247,148,29,.35)}
+.hint{margin:0;font-size:.85rem;color:var(--muted)}
+.drawer{margin:0 0 0 auto;height:100vh;max-height:100vh;border-radius:20px 0 0 20px;width:min(440px,100vw)}
+.sl-item{display:grid;grid-template-columns:96px 1fr auto;gap:var(--s2);align-items:center;padding:var(--s2) 0;border-bottom:1px solid var(--line)}
+.sl-item img,.sl-item .ph{width:96px;height:72px;object-fit:cover;border-radius:10px;background:#222}
+.sl-item b{display:block;font:600 1.1rem var(--head);text-transform:uppercase}
+.sl-item small{color:var(--muted)}
+.sl-item button{background:none;border:0;color:var(--muted);cursor:pointer;min-width:44px;min-height:44px}
+.sl-foot{padding:0 var(--s3) var(--s3)}
+.toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:#fff;color:#111;padding:12px 20px;border-radius:999px;font-weight:600;z-index:300;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.js .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s,transform .7s}
+.js .reveal.in{opacity:1;transform:none}
+@media (max-width:1023px){.px .wrap,.faq .wrap{grid-template-columns:1fr}}
+@media (max-width:639px){
+  .header-cta .book-open{display:none}
+  .toolbar{padding:var(--s2)}
+  .rng,.sort{min-width:100%}
+  .calc-row,.two{grid-template-columns:1fr}
+  .px-form{padding:var(--s3)}
+  .toast{bottom:84px}
+}
+@media (prefers-reduced-motion:reduce){.js .reveal{opacity:1;transform:none}.slide{transition:none}}
 </style>
 </head>
 <body>
-<div class="mockup-banner">Design mockup. Photos, reviews, badges and stock are placeholders; address, phone numbers and opening hours are from the current site.</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4.5 3.4 8 8 9 4.6-1 8-4.5 8-9V6l-8-3z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></symbol>
+  <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.5 5.5a4.5 4.5 0 0 0-5.6 5.6L3.5 16.5a2 2 0 0 0 3 3l5.4-5.4a4.5 4.5 0 0 0 5.6-5.6l-2.8 2.8-2.4-.6-.6-2.4z"/></symbol>
+  <symbol id="i-pound" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M14.5 8.5A3 3 0 0 0 9.5 10v2.5H14M9.5 12.5V15c0 1-.7 1.5-1.5 2h8"/></symbol>
+  <symbol id="i-swap" viewBox="0 0 24 24"><path d="M4 8h13l-3-3M20 16H7l3 3"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.2"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.5"/></symbol>
+  <symbol id="i-car" viewBox="0 0 24 24"><path d="M4 16v-4l2-5h12l2 5v4M4 16h16M4 16v2h3v-2M17 16v2h3v-2"/><circle cx="8" cy="13" r=".8"/><circle cx="16" cy="13" r=".8"/></symbol>
+
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-9-9.5A5 5 0 0 1 12 7a5 5 0 0 1 9 3.5C19.500 15.400 12 20 12 20z"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+</svg>
+
+<div class="mockup-banner">Design mockup. Car photos are cropped from your screenshots (replace with originals); reviews, badges, map and some copy are placeholders.</div>
 <a class="skip" href="#main">Skip to content</a>
 
 <div class="topbar">
   <div class="wrap">
-    <span class="addr">The Forecourt, Holyport, Berkshire</span>
-    <a href="tel:01628778889">01628 778889</a>
-    <a href="tel:07776307202">07776 307202</a>
-    <a href="#contact">Email us</a>
+    <div class="group addr"><span class="t"><svg class="ico"><use href="#i-pin"/></svg>The Forecourt, Holyport, Berkshire</span><span class="t open" id="openNow" aria-live="polite"><svg class="ico"><use href="#i-clock"/></svg><span>Checking hours…</span></span></div>
+    <div class="group">
+      <a class="t" href="tel:01628778889"><svg class="ico"><use href="#i-phone"/></svg>01628 778889</a>
+      <a class="t" href="tel:07776307202"><svg class="ico"><use href="#i-phone"/></svg>07776 307202</a>
+      <a class="t" href="#visit"><svg class="ico"><use href="#i-mail"/></svg>Email us</a>
+    </div>
   </div>
 </div>
 
@@ -189,12 +388,14 @@ footer a{color:#e3ece6}
         <li><a href="#finance">Finance</a></li>
         <li><a href="#services">Services</a></li>
         <li><a href="#services">Servicing</a></li>
-        <li><a href="#">About</a></li>
-        <li><a href="#contact">Contact</a></li>
+        <li><a href="#why">About</a></li>
+        <li><a href="#visit">Contact</a></li>
       </ul>
     </nav>
     <div class="header-cta">
-      <a class="btn" href="tel:01628778889">Call <span class="btn--call-text">01628 778889</span></a>
+      <button class="shortlist-btn" id="openShortlist" type="button" aria-label="Open shortlist"><svg class="ico"><use href="#i-heart"/></svg><span class="count" id="slCount">0</span></button>
+      <button class="btn btn--ghost btn--sm book-open" type="button" data-book="viewing"><svg class="ico" style="width:18px;height:18px"><use href="#i-cal"/></svg>Book</button>
+      <a class="btn btn--sm" href="tel:01628778889"><svg class="ico" style="width:18px;height:18px"><use href="#i-phone"/></svg>01628 778889</a>
       <details class="menu">
         <summary>Menu</summary>
         <nav aria-label="Mobile">
@@ -204,8 +405,8 @@ footer a{color:#e3ece6}
             <li><a href="#finance">Finance</a></li>
             <li><a href="#services">Services</a></li>
             <li><a href="#services">Servicing</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#contact">Contact</a></li>
+            <li><a href="#why">About</a></li>
+            <li><a href="#visit">Contact</a></li>
           </ul>
         </nav>
       </details>
@@ -214,121 +415,156 @@ footer a{color:#e3ece6}
 </header>
 
 <main id="main">
-  <section class="hero" aria-labelledby="h1">
-    <div class="wrap">
-      <div>
-        <h1 id="h1">Used MINIs, <br>chosen by specialists</h1>
-        <p>Browse our current stock, work out a monthly budget, or book your MINI in for service and MOT at our Holyport forecourt.</p>
-        <div class="cta-row">
-          <a class="btn" href="#stock">Search stock</a>
-          <a class="btn btn--ghost" href="tel:01628778889">Call 01628 778889</a>
-        </div>
-        <p class="ph-note">[Placeholder: hero photo of a MINI goes here]</p>
-      </div>
 
-      <form class="finder" action="#" aria-labelledby="finder-h">
-        <h2 id="finder-h">Find your MINI</h2>
-        <div class="tabs">
-          <input type="radio" name="mode" id="t-budget" checked>
-          <label for="t-budget">Monthly budget</label>
-          <input type="radio" name="mode" id="t-vehicle">
-          <label for="t-vehicle">Make and price</label>
-          <div class="panels" style="flex-basis:100%">
-            <div class="panel p-budget">
-              <div class="field">
-                <label for="budget">Monthly payment</label>
-                <div class="budget-out"><span>Up to</span><strong id="budget-val">£200</strong></div>
-                <input type="range" id="budget" min="100" max="800" step="50" value="200">
-              </div>
-              <p class="apr">12.5% APR representative</p>
-            </div>
-            <div class="panel p-vehicle">
-              <div class="field"><label for="model">Model</label>
-                <select id="model"><option>Any model</option><option>Hatch</option><option>Countryman</option></select></div>
-              <div class="field"><label for="maxprice">Maximum price</label>
-                <select id="maxprice"><option>Any price</option><option>£5,000</option><option>£7,500</option><option>£10,000</option></select></div>
-            </div>
-          </div>
-        </div>
-        <button class="btn" type="submit" style="width:100%">Search cars</button>
-      </form>
+  <section class="hero" aria-labelledby="h1">
+    <div class="bg"><img src="img/hero-red-mini.jpg" alt="Red MINI Cooper on a country road" fetchpriority="high"></div>
+    <div class="wrap">
+      <span class="eyebrow">Holyport, Berkshire</span>
+      <h1 id="h1">Used MINIs,<br><em>hand-picked</em><br>by specialists</h1>
+      <p class="lead">Every MINI is checked by our in-house team, HPI checked and backed by our 3-month warranty. Find yours online, then call us or book a viewing.</p>
+      <div class="cta-row">
+        <a class="btn" href="#stock">Browse used MINIs <svg class="ico" style="width:20px;height:20px"><use href="#i-arrow"/></svg></a>
+        <a class="btn btn--ghost" href="tel:01628778889"><svg class="ico" style="width:20px;height:20px"><use href="#i-phone"/></svg>01628 778889</a>
+      </div>
+      <ul class="hero-points">
+        <li><svg class="ico"><use href="#i-check"/></svg>Family run</li>
+        <li><svg class="ico"><use href="#i-check"/></svg>Over fifteen years serving Maidenhead</li>
+        <li><svg class="ico"><use href="#i-check"/></svg>On-site MOT station</li>
+      </ul>
     </div>
   </section>
 
-  <div class="strip">
+  <div class="finder-wrap">
+    <div class="wrap">
+      <form class="finder" id="finder" action="#stock" aria-labelledby="fh">
+        <div class="ttl" id="fh">Find your MINI<small>Search the current stock</small></div>
+        <div class="field"><label for="model">Model</label>
+          <select id="model"><option value="">Any model</option><option>Hatch</option><option>Countryman</option><option>Convertible</option></select></div>
+        <div class="field"><label for="price">Maximum price</label>
+          <select id="price"><option value="">Any price</option><option value="5000">Up to £5,000</option><option value="7500">Up to £7,500</option><option value="10000">Up to £10,000</option></select></div>
+        <div class="field"><label for="monthly">Or by monthly budget</label>
+          <select id="monthly"><option value="">Any budget</option><option value="100">Under £100 / month</option><option value="150">Under £150 / month</option><option value="200">Under £200 / month</option><option value="300">Under £300 / month</option></select></div>
+        <button class="btn" type="submit"><svg class="ico" style="width:20px;height:20px"><use href="#i-search"/></svg>Search</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="trust">
     <div class="wrap">
       <ul>
-        <li>HPI checked cars</li>
-        <li>3-month warranty</li>
-        <li>Same-day finance available</li>
-        <li>On-site MOT station</li>
+        <li><svg class="ico"><use href="#i-shield"/></svg><div><strong>HPI checked</strong><span>Every car, no exceptions</span></div></li>
+        <li><svg class="ico"><use href="#i-doc"/></svg><div><strong>3-month warranty</strong><span>Our "no quibble" cover</span></div></li>
+        <li><svg class="ico"><use href="#i-pound"/></svg><div><strong>Same-day finance</strong><span>Subject to status</span></div></li>
+        <li><svg class="ico"><use href="#i-wrench"/></svg><div><strong>On-site MOT</strong><span>And servicing, at the forecourt</span></div></li>
       </ul>
     </div>
   </div>
 
   <section id="stock" aria-labelledby="stock-h">
     <div class="wrap">
-      <div class="section-head">
-        <div><h2 id="stock-h">Latest arrivals</h2><p class="lead">Sample listings from the current site. Live stock will come from your stock feed.</p></div>
-        <a class="btn btn--ghost" href="#">View all cars</a>
+      <div class="head-row">
+        <div><span class="eyebrow">In stock now</span><h2 id="stock-h">Latest arrivals</h2></div>
+        <p class="count-note" id="resultCount" aria-live="polite"></p>
       </div>
-      <div class="grid">
-        <article class="card">
-          <div class="photo"><span class="ribbon">Warranty</span>[Photo]</div>
-          <div class="body">
-            <h3>MINI Countryman</h3>
-            <p class="sub">1.6 Cooper SUV 5dr Petrol Manual Euro 6 (s/s) (122 ps)</p>
-            <ul class="chips"><li>2013</li><li>35,000 miles</li><li>Manual</li><li>Petrol</li></ul>
-            <div class="price"><div class="pm"><small>Per month</small><strong>£165</strong></div><div><small>Cash price</small><strong>£6,990</strong></div></div>
-            <a class="btn" href="#">View car</a>
-          </div>
-        </article>
-        <article class="card">
-          <div class="photo"><span class="ribbon">Warranty</span>[Photo]</div>
-          <div class="body">
-            <h3>MINI Countryman</h3>
-            <p class="sub">1.6 Cooper SUV 5dr Petrol Manual Euro 6 (s/s) (122 ps)</p>
-            <ul class="chips"><li>2014</li><li>89,000 miles</li><li>Manual</li><li>Petrol</li></ul>
-            <div class="price"><div class="pm"><small>Per month</small><strong>£101</strong></div><div><small>Cash price</small><strong>£4,290</strong></div></div>
-            <a class="btn" href="#">View car</a>
-          </div>
-        </article>
-        <article class="card">
-          <div class="photo"><span class="ribbon">Warranty</span>[Photo]</div>
-          <div class="body">
-            <h3>MINI Hatch One</h3>
-            <p class="sub">One</p>
-            <ul class="chips"><li>2010</li><li>47,000 miles</li><li>6 speed manual</li><li>Petrol</li></ul>
-            <div class="price"><div class="pm"><small>Per month</small><strong>£139</strong></div><div><small>Cash price</small><strong>[price]</strong></div></div>
-            <a class="btn" href="#">View car</a>
-          </div>
-        </article>
+      <div class="toolbar" role="region" aria-label="Filter stock">
+        <div class="chips-filter" id="modelChips" role="group" aria-label="Model"></div>
+        <label class="rng"><span>Max price <b id="priceOut">Any</b></span><input type="range" id="priceRange" min="3000" max="12000" step="500" value="12000"></label>
+        <label class="rng"><span>Max monthly <b id="pmOut">Any</b></span><input type="range" id="pmRange" min="80" max="400" step="10" value="400"></label>
+        <label class="sort"><span>Sort</span><select id="sort"><option value="featured">Featured</option><option value="new">Newest first</option><option value="pm-asc">Monthly: low to high</option><option value="price-asc">Price: low to high</option><option value="price-desc">Price: high to low</option><option value="miles">Lowest mileage</option></select></label>
+        <button class="btn btn--ghost btn--sm" type="button" id="resetFilters">Reset</button>
       </div>
+      <div class="grid" id="results"></div>
+      <div class="empty" id="empty" hidden>
+        <h3>No MINIs match those filters</h3>
+        <p>Try a wider budget, or tell us what you want and we'll source it for you.</p>
+        <button class="btn" type="button" data-book="sourcing">Ask us to find one</button>
+      </div>
+      <p class="sample">Mock stock: the first three are from the current site; cars marked SAMPLE are invented placeholders. Live stock will come from your stock feed.</p>
+    </div>
+  </section>
+
+  <section class="split" id="finance" aria-labelledby="fin-h">
+    <div class="wrap">
+      <div class="pic"><img src="img/mini-badge-cooper.jpg" alt="Close-up of a MINI Cooper badge" loading="lazy"></div>
+      <div>
+        <span class="eyebrow">Finance</span>
+        <h2 id="fin-h">What can I afford?</h2>
+        <p class="lead">Pick a monthly budget and see the MINIs that fit. We work with leading lenders and specialist motor finance providers.</p>
+        <form class="calc" id="calc" onsubmit="return false">
+          <div class="calc-out"><small>Budget</small><strong id="calcMonthly">£200</strong><span>/ month</span></div>
+          <label>Monthly payment<input type="range" id="cMonthly" min="80" max="800" step="10" value="200"></label>
+          <div class="calc-row">
+            <label>Deposit<select id="cDeposit"><option value="0">£0</option><option value="500">£500</option><option value="1000">£1,000</option><option value="2000">£2,000</option></select></label>
+            <label>Term<select id="cTerm"><option value="36">36 months</option><option value="48" selected>48 months</option><option value="60">60 months</option></select></label>
+          </div>
+          <div class="calc-result"><span>Estimated car budget</span><strong id="calcPrice">£0</strong></div>
+          <div class="cta-row"><button class="btn" type="button" id="calcShow">Show matching cars <svg class="ico" style="width:20px;height:20px"><use href="#i-arrow"/></svg></button><button class="btn btn--ghost" type="button" data-book="finance">Talk to us about finance</button></div>
+        </form>
+        <div class="apr"><svg class="ico"><use href="#i-info"/></svg><div><strong>12.5% APR representative.</strong> Illustrative estimate only, not an offer or quote. Based on the representative APR above; your rate depends on your circumstances. [Full finance wording, lender and credit-broker disclosure to be supplied.]</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="why" id="why" aria-labelledby="why-h">
+    <div class="wrap">
+      <span class="eyebrow">Why Berkeley Cars</span>
+      <h2 id="why-h">A family-run MINI specialist</h2>
+      <p class="lead">For over fifteen years Berkeley Cars has been a leading supplier of used MINIs in the Maidenhead area, with specialist knowledge of the whole MINI range.</p>
+      <div class="cols">
+        <div class="col"><span class="num">01</span><h3>Hand-picked</h3><p>Every MINI is personally hand-picked by our business owner and checked by our in-house team of technicians.</p></div>
+        <div class="col"><span class="num">02</span><h3>Protected</h3><p>Each MINI is fully HPI checked and comes with our unique 3-month "no quibble" warranty, with our aftersales team on hand.</p></div>
+        <div class="col"><span class="num">03</span><h3>Looked after for life</h3><p>With a qualified team of technicians and an on-site MOT station, many customers come back year after year.</p></div>
+      </div>
+      <figure class="strip-photo"><img src="img/forecourt.jpg" alt="MINIs parked on the Berkeley Cars forecourt" loading="lazy"><figcaption>Our forecourt in Holyport</figcaption></figure>
     </div>
   </section>
 
   <section class="services" id="services" aria-labelledby="svc-h">
     <div class="wrap">
-      <h2 id="svc-h">Buy, finance, service</h2>
-      <div class="svc" id="finance">
-        <article>
-          <div class="icon" aria-hidden="true">1</div>
-          <h3>MINI specialists</h3>
-          <p>Explore our full range of competitively priced models online and find the perfect pre-owned vehicle for your budget.</p>
-          <a class="btn" href="#stock">Search stock</a>
-        </article>
-        <article>
-          <div class="icon" aria-hidden="true">2</div>
-          <h3>Finance</h3>
-          <p>We work with leading lenders and specialist motor finance providers to secure competitive deals tailored to your budget. Representative APR: 12.5%.</p>
-          <a class="btn" href="#">Apply now</a>
-        </article>
-        <article>
-          <div class="icon" aria-hidden="true">3</div>
-          <h3>Service and MOT</h3>
-          <p>Trust our experienced team and professional equipment for top-quality vehicle inspections.</p>
-          <a class="btn" href="#">Book now</a>
-        </article>
+      <span class="eyebrow">Services</span>
+      <h2 id="svc-h">Everything for your MINI</h2>
+      <div class="svc">
+        <article><div class="ic"><svg class="ico"><use href="#i-wrench"/></svg></div><h3>Service and MOT</h3><p>Trust our experienced team and professional equipment for top-quality vehicle inspections.</p><a class="more book-open" href="#" data-book="service">Book now <svg class="ico" style="width:18px;height:18px"><use href="#i-arrow"/></svg></a></article>
+        <article><div class="ic"><svg class="ico"><use href="#i-swap"/></svg></div><h3>Part exchange</h3><p>Part exchange your current car against your next MINI. [Copy to be confirmed.]</p><a class="more" href="#part-exchange">Find out more <svg class="ico" style="width:18px;height:18px"><use href="#i-arrow"/></svg></a></article>
+        <article><div class="ic"><svg class="ico"><use href="#i-tag"/></svg></div><h3>Looking to sell?</h3><p>Thinking of selling your MINI? Get in touch. [Copy to be confirmed.]</p><a class="more" href="#part-exchange">Find out more <svg class="ico" style="width:18px;height:18px"><use href="#i-arrow"/></svg></a></article>
+        <article><div class="ic"><svg class="ico"><use href="#i-car"/></svg></div><h3>Vehicle sourcing</h3><p>Can't see the right MINI? Register your details and our team will do their best to find your ideal car.</p><a class="more book-open" href="#" data-book="sourcing">Enquire <svg class="ico" style="width:18px;height:18px"><use href="#i-arrow"/></svg></a></article>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="px" id="part-exchange" aria-labelledby="px-h">
+    <div class="wrap">
+      <div>
+        <span class="eyebrow">Part exchange</span>
+        <h2 id="px-h">Get a valuation for your car</h2>
+        <p class="lead">Enter your registration and mileage and we'll come back to you. Part exchange welcome against any car in stock.</p>
+        <ul class="dlist"><li><svg class="ico"><use href="#i-check"/></svg>No obligation</li><li><svg class="ico"><use href="#i-check"/></svg>Reply from our team, not a bot</li></ul>
+      </div>
+      <form class="px-form" id="pxForm" novalidate>
+        <label class="plate-wrap">Your registration
+          <span class="plate"><span class="gb">GB</span><input id="reg" name="reg" maxlength="8" placeholder="AB12 CDE" autocomplete="off" aria-label="Registration number" required></span>
+        </label>
+        <div class="two">
+          <label>Mileage<input type="number" id="pxMiles" min="0" step="500" placeholder="e.g. 60000" required></label>
+          <label>Your phone<input type="tel" id="pxPhone" placeholder="07..." autocomplete="tel" required></label>
+        </div>
+        <button class="btn" type="submit">Request valuation</button>
+        <p class="form-msg" id="pxMsg" role="status" hidden></p>
+      </form>
+    </div>
+  </section>
+
+  <section class="faq" aria-labelledby="faq-h">
+    <div class="wrap">
+      <div class="faq-head"><span class="eyebrow">Questions</span><h2 id="faq-h">Good to know</h2></div>
+      <div class="faq-list">
+        <details><summary>Are your cars HPI checked?<svg class="ico"><use href="#i-plus"/></svg></summary><p>Yes. Each of our MINIs has been fully HPI checked.</p></details>
+        <details><summary>Is there a warranty?<svg class="ico"><use href="#i-plus"/></svg></summary><p>Every car comes with our unique 3-month "no quibble" warranty, and our aftersales team will be on hand to answer questions in the weeks and months after you drive away.</p></details>
+        <details><summary>Can you arrange finance?<svg class="ico"><use href="#i-plus"/></svg></summary><p>We can arrange same-day finance and drive-away insurance. Finance is subject to status. Representative APR 12.5%.</p></details>
+        <details><summary>Can I view a car without an appointment?<svg class="ico"><use href="#i-plus"/></svg></summary><p>Viewings are by appointment only, so we're ready for you. Use the Book button or call 01628 778889.</p></details>
+        <details><summary>What if you don't have the MINI I want?<svg class="ico"><use href="#i-plus"/></svg></summary><p>Register your details and our team will do their best to find your ideal MINI through our vehicle sourcing service.</p></details>
+        <details><summary>Do you service and MOT MINIs?<svg class="ico"><use href="#i-plus"/></svg></summary><p>Yes, we have a qualified team of technicians and an on-site MOT station.</p></details>
       </div>
     </div>
   </section>
@@ -336,46 +572,48 @@ footer a{color:#e3ece6}
   <section class="reviews" aria-labelledby="rev-h">
     <div class="wrap">
       <div>
-        <h2 id="rev-h">Customer reviews</h2>
-        <p class="lead">We pride ourselves on our high customer service. But don't just take our word for it, read all our customer reviews.</p>
+        <span class="eyebrow">Reviews</span>
+        <h2 id="rev-h">Don't just take our word for it</h2>
+        <p class="lead">We pride ourselves on our high customer service. Read what our customers say.</p>
         <a class="btn" href="#">Read reviews</a>
         <div class="badges"><span class="badge">[Google badge]</span><span class="badge">[AutoTrader badge]</span><span class="badge">[JudgeService badge]</span></div>
       </div>
-      <figure class="quote" style="margin:0">
-        <div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
-        <p>[Placeholder: a real customer review goes here. Use genuine, permitted reviews only.]</p>
-        <figcaption><strong>[Reviewer name]</strong></figcaption>
-      </figure>
+      <div class="slider" id="slider" aria-roledescription="carousel" aria-label="Customer reviews">
+        <div class="slides" id="slides">
+          <figure class="quote slide"><div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div><p>[Placeholder 1: a real, permitted customer review goes here.]</p><figcaption>[Reviewer name]</figcaption></figure>
+          <figure class="quote slide"><div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div><p>[Placeholder 2: a real, permitted customer review goes here.]</p><figcaption>[Reviewer name]</figcaption></figure>
+          <figure class="quote slide"><div class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</div><p>[Placeholder 3: a real, permitted customer review goes here.]</p><figcaption>[Reviewer name]</figcaption></figure>
+        </div>
+        <div class="slider-ctl">
+          <button type="button" id="prev" aria-label="Previous review"><svg class="ico"><use href="#i-left"/></svg></button>
+          <span id="dots" class="dots"></span>
+          <button type="button" id="next" aria-label="Next review"><svg class="ico"><use href="#i-right"/></svg></button>
+        </div>
+      </div>
     </div>
   </section>
 
-  <section class="contact" id="contact" aria-labelledby="contact-h">
+  <section class="visit" id="visit" aria-labelledby="visit-h">
     <div class="wrap">
+      <div class="map" role="img" aria-label="Map placeholder"><div><svg class="ico pin"><use href="#i-pin"/></svg>[Map embed goes here]<br>SL6 2ND</div></div>
       <div>
-        <h2 id="contact-h">Visit or call</h2>
-        <address>
-          Berkeley Cars<br>The Forecourt<br>Moneyrow Green<br>Holyport<br>Berkshire<br>SL6 2ND
-        </address>
-      </div>
-      <div>
-        <h2>Get in touch</h2>
-        <a class="big" href="tel:01628778889">01628 778889</a>
-        <a class="big" href="tel:07776307202">07776 307202</a>
-        <p><a href="#">Send us a message</a></p>
+        <h2 id="visit-h">Visit us</h2>
+        <address>Berkeley Cars<br>The Forecourt<br>Moneyrow Green<br>Holyport, Berkshire<br>SL6 2ND</address>
+        <a class="big" href="tel:01628778889"><svg class="ico"><use href="#i-phone"/></svg>01628 778889</a>
+        <a class="big" href="tel:07776307202"><svg class="ico"><use href="#i-phone"/></svg>07776 307202</a>
+        <p style="margin-top:16px"><button class="btn btn--sm" type="button" data-book="viewing"><svg class="ico" style="width:18px;height:18px"><use href="#i-cal"/></svg>Book a viewing</button></p>
       </div>
       <div>
         <h2>Opening hours</h2>
-        <table class="hours">
-          <tbody>
-            <tr><th scope="row">Monday</th><td>10:00 - 17:00</td></tr>
-            <tr><th scope="row">Tuesday</th><td>10:00 - 17:00</td></tr>
-            <tr><th scope="row">Wednesday</th><td>10:00 - 17:00</td></tr>
-            <tr><th scope="row">Thursday</th><td>10:00 - 17:00</td></tr>
-            <tr><th scope="row">Friday</th><td>10:00 - 17:00</td></tr>
-            <tr><th scope="row">Saturday</th><td>10:00 - 16:00</td></tr>
-            <tr><th scope="row">Sunday</th><td>Closed</td></tr>
-          </tbody>
-        </table>
+        <table class="hours"><tbody>
+          <tr data-day="1"><th scope="row">Monday</th><td>10:00 - 17:00</td></tr>
+          <tr data-day="2"><th scope="row">Tuesday</th><td>10:00 - 17:00</td></tr>
+          <tr data-day="3"><th scope="row">Wednesday</th><td>10:00 - 17:00</td></tr>
+          <tr data-day="4"><th scope="row">Thursday</th><td>10:00 - 17:00</td></tr>
+          <tr data-day="5"><th scope="row">Friday</th><td>10:00 - 17:00</td></tr>
+          <tr data-day="6"><th scope="row">Saturday</th><td>10:00 - 16:00</td></tr>
+          <tr data-day="0"><th scope="row">Sunday</th><td>Closed</td></tr>
+        </tbody></table>
         <p class="note">Viewings by appointment only!</p>
       </div>
     </div>
@@ -384,14 +622,234 @@ footer a{color:#e3ece6}
 
 <footer>
   <div class="wrap">
-    <p>&copy; Berkeley Cars. [Company registration, FCA and credit-broker wording to be supplied.]</p>
+    <p style="margin:0">&copy; Berkeley Cars. [Company registration, FCA and credit-broker wording to be supplied.]</p>
     <ul><li><a href="#">Cookie policy</a></li><li><a href="#">Privacy</a></li><li><a href="#">Terms</a></li></ul>
   </div>
 </footer>
 
+
+<dialog id="bookDlg" aria-labelledby="bookTitle">
+  <form method="dialog" class="dlg-head"><h2 id="bookTitle">Book with us</h2><button class="x" aria-label="Close"><svg class="ico"><use href="#i-x"/></svg></button></form>
+  <form id="bookForm" novalidate>
+    <fieldset class="types"><legend>What would you like to book?</legend>
+      <label><input type="radio" name="type" value="viewing" checked><span>Viewing / test drive</span></label>
+      <label><input type="radio" name="type" value="service"><span>Service</span></label>
+      <label><input type="radio" name="type" value="mot"><span>MOT</span></label>
+      <label><input type="radio" name="type" value="finance"><span>Finance chat</span></label>
+      <label><input type="radio" name="type" value="sourcing"><span>Find me a MINI</span></label>
+    </fieldset>
+    <p class="for-car" id="forCar" hidden></p>
+    <div class="two">
+      <label>Date<input type="date" id="bDate" required></label>
+      <label>Time<select id="bTime" required></select></label>
+    </div>
+    <p class="hint" id="bHint">Choose a date to see available times.</p>
+    <div class="two">
+      <label>Your name<input id="bName" autocomplete="name" required></label>
+      <label>Phone<input id="bPhone" type="tel" autocomplete="tel" required></label>
+    </div>
+    <label>Notes (optional)<textarea id="bNotes" rows="2"></textarea></label>
+    <button class="btn" type="submit">Request booking</button>
+    <p class="form-msg" id="bMsg" role="status" hidden></p>
+  </form>
+</dialog>
+
+<dialog id="slDlg" class="drawer" aria-labelledby="slTitle">
+  <form method="dialog" class="dlg-head"><h2 id="slTitle">Your shortlist</h2><button class="x" aria-label="Close"><svg class="ico"><use href="#i-x"/></svg></button></form>
+  <div id="slList"></div>
+  <div class="sl-foot"><button class="btn" type="button" id="slBook" data-book="viewing">Book a viewing for these</button></div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<div class="callbar">
+  <a href="tel:01628778889"><svg class="ico" style="width:20px;height:20px"><use href="#i-phone"/></svg>Call us</a>
+  <a href="#stock"><svg class="ico" style="width:20px;height:20px"><use href="#i-car"/></svg>View cars</a>
+</div>
+
+
 <script>
-  const r=document.getElementById('budget'),o=document.getElementById('budget-val');
-  r.addEventListener('input',()=>{o.textContent='£'+r.value});
+(function(){
+  document.documentElement.classList.add('js');
+  var $=function(s,r){return (r||document).querySelector(s)}, $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+  var gbp=function(n){return '£'+Math.round(n).toLocaleString('en-GB')};
+
+  /* ---------- stock data (first 3 from the current site; others are SAMPLE) ---------- */
+  var CARS=[
+    {id:1,model:'Countryman',spec:'1.6 Cooper SUV 5dr Petrol Manual Euro 6 (s/s) (122 ps)',year:2013,miles:35000,gear:'Manual',fuel:'Petrol',pm:165,price:6990,img:'img/stock-countryman-navy.jpg',alt:'Black MINI Countryman with red bonnet stripes'},
+    {id:2,model:'Countryman',spec:'1.6 Cooper SUV 5dr Petrol Manual Euro 6 (s/s) (122 ps)',year:2014,miles:89000,gear:'Manual',fuel:'Petrol',pm:101,price:4290,img:'img/stock-countryman-blue.jpg',alt:'Blue MINI Countryman'},
+    {id:3,model:'Hatch',name:'Hatch One',spec:'One',year:2010,miles:47000,gear:'6 speed manual',fuel:'Petrol',pm:139,price:null,img:null},
+    {id:4,model:'Hatch',name:'Hatch Cooper',spec:'1.6 Cooper 3dr',year:2012,miles:52000,gear:'Manual',fuel:'Petrol',pm:128,price:5450,img:null,sample:true},
+    {id:5,model:'Convertible',name:'Convertible Cooper',spec:'1.6 Cooper 2dr',year:2011,miles:61000,gear:'Manual',fuel:'Petrol',pm:176,price:7295,img:null,sample:true},
+    {id:6,model:'Hatch',name:'Hatch Cooper S',spec:'1.6 Cooper S 3dr',year:2015,miles:38000,gear:'Manual',fuel:'Petrol',pm:236,price:9450,img:null,sample:true}
+  ];
+  var state={model:'',price:12000,pm:400,sort:'featured'};
+  var short=[]; try{short=JSON.parse(localStorage.getItem('bc_short')||'[]')}catch(e){}
+  var saveShort=function(){try{localStorage.setItem('bc_short',JSON.stringify(short))}catch(e){}};
+
+  function title(c){return 'MINI '+(c.name||c.model)}
+  function cardHTML(c){
+    var saved=short.indexOf(c.id)>-1;
+    var photo=c.img?'<img src="'+c.img+'" alt="'+c.alt+'" loading="lazy">':'<div class="noimg" role="img" aria-label="Photo to come"><svg class="ico"><use href="#i-car"/></svg></div>';
+    return '<article class="card reveal in" data-id="'+c.id+'"><div class="photo">'+
+      (c.sample?'<span class="tag sample">Sample</span>':'<span class="tag">RAC warranty</span>')+
+      photo+
+      '<button class="heart" type="button" aria-pressed="'+saved+'" aria-label="'+(saved?'Remove from':'Add to')+' shortlist: '+title(c)+'"><svg class="ico"><use href="#i-heart"/></svg></button></div>'+
+      '<div class="body"><h3><b>MINI</b> '+(c.name||c.model)+'</h3><p class="sub">'+c.spec+'</p>'+
+      '<ul class="chips"><li>'+c.year+'</li><li>'+c.miles.toLocaleString('en-GB')+' miles</li><li>'+c.gear+'</li><li>'+c.fuel+'</li></ul>'+
+      '<div class="price"><div class="pm"><small>Per month</small><strong>'+gbp(c.pm)+'</strong></div><div><small>Cash price</small><strong>'+(c.price?gbp(c.price):'Ask us')+'</strong></div></div>'+
+      '<div class="actions"><button class="btn btn--sm" type="button" data-book="viewing" data-car="'+title(c)+' ('+c.year+')">Book viewing</button></div></div></article>';
+  }
+  function render(){
+    var list=CARS.filter(function(c){
+      if(state.model && c.model!==state.model) return false;
+      if(state.price<12000 && (c.price===null || c.price>state.price)) return false;
+      if(state.pm<400 && c.pm>state.pm) return false;
+      return true;
+    });
+    var cmp={featured:function(a,b){return a.id-b.id},new:function(a,b){return b.year-a.year},'pm-asc':function(a,b){return a.pm-b.pm},'price-asc':function(a,b){return (a.price||1e9)-(b.price||1e9)},'price-desc':function(a,b){return (b.price||0)-(a.price||0)},miles:function(a,b){return a.miles-b.miles}}[state.sort];
+    list.sort(cmp);
+    $('#results').innerHTML=list.map(cardHTML).join('');
+    $('#empty').hidden=list.length>0;
+    $('#resultCount').innerHTML='Showing <b>'+list.length+'</b> of '+CARS.length+' MINIs';
+    $('#priceOut').textContent=state.price>=12000?'Any':'Up to '+gbp(state.price);
+    $('#pmOut').textContent=state.pm>=400?'Any':'Up to '+gbp(state.pm);
+    $$('#modelChips button').forEach(function(b){b.setAttribute('aria-pressed',String((b.dataset.m||'')===state.model))});
+  }
+  var chips=$('#modelChips');
+  [['','All'],['Hatch','Hatch'],['Countryman','Countryman'],['Convertible','Convertible']].forEach(function(m){
+    var b=document.createElement('button');b.type='button';b.dataset.m=m[0];b.textContent=m[1];
+    b.onclick=function(){state.model=m[0];render()};chips.appendChild(b);
+  });
+  $('#priceRange').oninput=function(){state.price=+this.value;render()};
+  $('#pmRange').oninput=function(){state.pm=+this.value;render()};
+  $('#sort').onchange=function(){state.sort=this.value;render()};
+  $('#resetFilters').onclick=function(){state={model:'',price:12000,pm:400,sort:'featured'};$('#priceRange').value=12000;$('#pmRange').value=400;$('#sort').value='featured';render()};
+
+  /* hero finder drives the stock */
+  $('#finder').addEventListener('submit',function(e){
+    e.preventDefault();
+    state.model=$('#model').value;
+    state.price=+($('#price').value||12000);
+    var m=+($('#monthly').value||400); state.pm=m;
+    $('#priceRange').value=Math.min(12000,Math.max(3000,state.price)); $('#pmRange').value=Math.min(400,Math.max(80,m));
+    render(); $('#stock').scrollIntoView({behavior:'smooth'});
+  });
+
+  /* ---------- shortlist ---------- */
+  function updateShort(){
+    $('#slCount').textContent=short.length;
+    var h=short.length?short.map(function(id){var c=CARS.filter(function(x){return x.id===id})[0];if(!c)return '';
+      return '<div class="sl-item">'+(c.img?'<img src="'+c.img+'" alt="">':'<div class="ph"></div>')+'<div><b>'+title(c)+'</b><small>'+c.year+' · '+c.miles.toLocaleString('en-GB')+' miles · '+gbp(c.pm)+'/mo</small></div><button type="button" data-remove="'+id+'" aria-label="Remove '+title(c)+'"><svg class="ico" style="width:20px;height:20px"><use href="#i-x"/></svg></button></div>'}).join('')
+      :'<p style="padding:var(--s3);color:var(--muted)">Tap the heart on any car to save it here.</p>';
+    $('#slList').innerHTML=h; $('#slBook').hidden=!short.length;
+  }
+  document.addEventListener('click',function(e){
+    var heart=e.target.closest('.heart');
+    if(heart){var id=+heart.closest('.card').dataset.id,i=short.indexOf(id);
+      if(i>-1)short.splice(i,1);else{short.push(id);toast('Saved to your shortlist')}
+      saveShort();updateShort();heart.setAttribute('aria-pressed',String(i===-1));return}
+    var rm=e.target.closest('[data-remove]');
+    if(rm){short=short.filter(function(x){return x!==+rm.dataset.remove});saveShort();updateShort();render();return}
+  });
+  $('#openShortlist').onclick=function(){updateShort();$('#slDlg').showModal()};
+
+  /* ---------- toast ---------- */
+  var tt;function toast(m){var t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(function(){t.hidden=true},2200)}
+
+  /* ---------- opening hours: open-now + booking slots ---------- */
+  var HOURS={0:null,1:[10,17],2:[10,17],3:[10,17],4:[10,17],5:[10,17],6:[10,16]};
+  var DAYN=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  function london(){var p=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/London',weekday:'short',hour:'numeric',minute:'numeric',hour12:false}).formatToParts(new Date()),o={};p.forEach(function(x){o[x.type]=x.value});
+    var d={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6}[o.weekday];return{day:d,mins:(+o.hour%24)*60+ +o.minute}}
+  function openNow(){
+    var n=london(),h=HOURS[n.day],el=$('#openNow'),txt;
+    var isOpen=h&&n.mins>=h[0]*60&&n.mins<h[1]*60;
+    if(isOpen)txt='Open now · closes '+h[1]+':00';
+    else{var d=n.day,add=0;if(h&&n.mins<h[0]*60){txt='Closed · opens today at '+h[0]+':00'}
+      else{do{d=(d+1)%7;add++}while(!HOURS[d]);txt='Closed · opens '+(add===1?'tomorrow':DAYN[d])+' at '+HOURS[d][0]+':00'}}
+    el.classList.toggle('is-open',!!isOpen);
+    el.innerHTML='<span class="dot" aria-hidden="true"></span><span>'+txt+'</span>';
+    $$('.hours tr').forEach(function(r){r.style.color=(+r.dataset.day===n.day)?'var(--orange)':''});
+  }
+  openNow();setInterval(openNow,60000);
+
+  /* ---------- booking dialog ---------- */
+  var dlg=$('#bookDlg'),bDate=$('#bDate'),bTime=$('#bTime');
+  var iso=function(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+  function setMin(){var d=new Date();bDate.min=iso(d)}
+  function fillTimes(){
+    bTime.innerHTML='';
+    if(!bDate.value){$('#bHint').textContent='Choose a date to see available times.';return}
+    var d=new Date(bDate.value+'T12:00:00'),h=HOURS[d.getDay()];
+    if(!h){$('#bHint').textContent='We are closed on Sundays. Please choose another day.';bTime.innerHTML='<option value="">Closed</option>';return}
+    var now=london(),today=iso(new Date())===bDate.value;
+    for(var m=h[0]*60;m<h[1]*60;m+=30){
+      if(today&&m<=now.mins+30)continue;
+      var o=document.createElement('option'),t=String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');o.value=t;o.textContent=t;bTime.appendChild(o)}
+    if(!bTime.options.length)bTime.innerHTML='<option value="">No times left today</option>';
+    $('#bHint').textContent=DAYN[d.getDay()]+': we are open '+h[0]+':00 to '+h[1]+':00. Viewings by appointment only.';
+  }
+  bDate.addEventListener('change',fillTimes);
+  document.addEventListener('click',function(e){
+    var b=e.target.closest('[data-book]');if(!b)return;
+    if(b.tagName==='A')e.preventDefault();
+    if($('#slDlg').open)$('#slDlg').close();
+    var t=b.dataset.book,r=$('input[name=type][value='+t+']');if(r)r.checked=true;
+    var fc=$('#forCar'),car=b.dataset.car||(t==='viewing'&&b.id==='slBook'?short.map(function(id){var c=CARS.filter(function(x){return x.id===id})[0];return title(c)}).join(', '):'');
+    fc.hidden=!car;fc.textContent=car?'Regarding: '+car:'';
+    $('#bMsg').hidden=true;setMin();dlg.showModal();
+  });
+  $('#bookForm').addEventListener('submit',function(e){
+    e.preventDefault();var ok=true,msg=$('#bMsg');
+    [bDate,bTime,$('#bName'),$('#bPhone')].forEach(function(f){var bad=!f.value.trim();f.setAttribute('aria-invalid',bad);if(bad)ok=false});
+    if(ok&&!/^[0-9+()\s-]{9,}$/.test($('#bPhone').value)){$('#bPhone').setAttribute('aria-invalid','true');ok=false}
+    msg.hidden=false;msg.className='form-msg'+(ok?'':' err');
+    msg.textContent=ok?'Thanks '+$('#bName').value.split(' ')[0]+'. Demo only: in the live site this would be sent to the team, who confirm your '+DAYN[new Date(bDate.value+'T12:00:00').getDay()]+' '+bTime.value+' slot by phone.':'Please complete the date, time, name and a valid phone number.';
+    if(ok)$('#bookForm').reset(),bTime.innerHTML='',$('#bHint').textContent='Choose a date to see available times.';
+  });
+
+  /* ---------- finance calculator ---------- */
+  var APR=12.5;
+  function calc(){
+    var m=+$('#cMonthly').value,n=+$('#cTerm').value,dep=+$('#cDeposit').value,r=APR/100/12;
+    var pv=m*(1-Math.pow(1+r,-n))/r,price=pv+dep;
+    $('#calcMonthly').textContent=gbp(m);$('#calcPrice').textContent='about '+gbp(Math.round(price/50)*50);
+    return{m:m,price:price};
+  }
+  ['cMonthly','cTerm','cDeposit'].forEach(function(id){$('#'+id).addEventListener('input',calc)});calc();
+  $('#calcShow').onclick=function(){
+    var c=calc();state={model:'',price:12000,pm:400,sort:'pm-asc'};
+    state.pm=Math.min(400,Math.max(80,c.m));$('#pmRange').value=state.pm;$('#priceRange').value=12000;$('#sort').value='pm-asc';
+    render();$('#stock').scrollIntoView({behavior:'smooth'});
+  };
+
+  /* ---------- part-exchange form ---------- */
+  var reg=$('#reg');reg.addEventListener('input',function(){this.value=this.value.toUpperCase().replace(/[^A-Z0-9 ]/g,'')});
+  $('#pxForm').addEventListener('submit',function(e){
+    e.preventDefault();var msg=$('#pxMsg'),r=reg.value.replace(/\s/g,'');
+    var okReg=r.length>=2&&r.length<=8,okM=+$('#pxMiles').value>0,okP=/^[0-9+()\s-]{9,}$/.test($('#pxPhone').value);
+    reg.setAttribute('aria-invalid',!okReg);$('#pxMiles').setAttribute('aria-invalid',!okM);$('#pxPhone').setAttribute('aria-invalid',!okP);
+    msg.hidden=false;var ok=okReg&&okM&&okP;msg.className='form-msg'+(ok?'':' err');
+    msg.textContent=ok?'Thanks. Demo only: in the live site this sends '+reg.value+' to the team, who will call you with a valuation.':'Please enter your registration, mileage and a valid phone number.';
+    if(ok)this.reset();
+  });
+
+  /* ---------- reviews slider ---------- */
+  var slides=$$('.slide'),dots=$('#dots'),cur=0,timer;
+  slides.forEach(function(_,i){var d=document.createElement('i');dots.appendChild(d)});
+  function go(i){cur=(i+slides.length)%slides.length;slides.forEach(function(s,k){s.classList.toggle('on',k===cur);s.setAttribute('aria-hidden',k!==cur)});$$('i',dots).forEach(function(d,k){d.classList.toggle('on',k===cur)})}
+  $('#prev').onclick=function(){go(cur-1);restart()};$('#next').onclick=function(){go(cur+1);restart()};
+  function restart(){clearInterval(timer);if(!matchMedia('(prefers-reduced-motion:reduce)').matches)timer=setInterval(function(){go(cur+1)},7000)}
+  $('#slider').addEventListener('mouseenter',function(){clearInterval(timer)});$('#slider').addEventListener('mouseleave',restart);
+  go(0);restart();
+
+  /* ---------- scroll reveal ---------- */
+  var io='IntersectionObserver' in window?new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12}):null;
+  $$('.trust li,.why .col,.svc article,.px-form,.faq-list details,.split .pic').forEach(function(el){el.classList.add('reveal');io?io.observe(el):el.classList.add('in')});
+
+  render();updateShort();
+})();
 </script>
 </body>
 </html>
