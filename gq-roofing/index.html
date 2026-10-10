@@ -11,141 +11,7 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"RoofingContractor","name":"GQ & Sons Roofing & Building Ltd","url":"https://gqroofing.co.uk/","telephone":"+441753851156","email":"GQroofing@hotmail.com","areaServed":["Windsor","Slough","Ascot","Maidenhead","Berkshire","Buckinghamshire","Surrey","London"],"priceRange":"££"}
 </script>
-<style>
-:root{
-  --ink:#0b1220;--navy:#0f1b33;--navy2:#16264a;--gold:#1f6fd1;--gold2:#6db0ff;
-  --bg:#fafaf7;--card:#fff;--mut:#5d667a;--line:#e6e8ee;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{font-family:Inter,system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased}
-h1,h2,h3{font-family:'Playfair Display',Georgia,serif;line-height:1.15}
-a{color:inherit;text-decoration:none}
-.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
-section{padding:96px 0}
-.eyebrow{display:inline-block;color:var(--gold);font-weight:600;letter-spacing:.18em;text-transform:uppercase;font-size:.78rem;margin-bottom:14px}
-h2{font-size:clamp(2rem,4vw,3rem);margin-bottom:16px}
-.lead{color:var(--mut);max-width:620px;font-size:1.08rem}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:15px 28px;border-radius:999px;font-weight:600;font-size:.98rem;transition:.25s;cursor:pointer;border:0}
-.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;box-shadow:0 10px 30px -10px rgba(31,111,209,.7)}
-.btn-gold:hover{transform:translateY(-2px);box-shadow:0 16px 36px -10px rgba(31,111,209,.9)}
-.btn-ghost{border:1.5px solid rgba(255,255,255,.4);color:#fff}
-.btn-ghost:hover{background:rgba(255,255,255,.1)}
-/* top bar + nav */
-.topbar{background:var(--ink);color:#c9d0e0;font-size:.82rem;padding:8px 0}
-.topbar .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.topbar b{color:var(--gold2)}
-header{position:sticky;top:0;z-index:50;background:rgba(15,27,51,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.08)}
-nav{display:flex;align-items:center;justify-content:space-between;height:74px}
-.logo{display:flex;align-items:center;gap:12px;color:#fff;font-family:'Playfair Display',serif;font-weight:800;font-size:1.45rem}
-.logo i{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--gold),var(--gold2));display:grid;place-items:center;color:#fff;font-style:normal;font-size:1rem}
-.logo small{display:block;font-family:Inter;font-weight:500;font-size:.62rem;letter-spacing:.3em;color:var(--gold2);margin-top:-4px}
-.links{display:flex;gap:30px;color:#d6dcec;font-size:.93rem;font-weight:500}
-.links a:hover{color:var(--gold2)}
-.nav-cta{padding:11px 22px;font-size:.9rem}
-@media(max-width:860px){.links{display:none}}
-/* hero */
-.hero{position:relative;color:#fff;padding:120px 0 0;background:
-  radial-gradient(900px 500px at 85% 10%,rgba(31,111,209,.22),transparent 60%),
-  linear-gradient(160deg,var(--navy),#08101f 70%);overflow:hidden}
-.hero:before{content:"";position:absolute;inset:0;opacity:.07;background-image:repeating-linear-gradient(135deg,#fff 0 1px,transparent 1px 38px)}
-.hero .wrap{position:relative;display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}
-.hero h1{font-size:clamp(2.6rem,6vw,4.6rem);margin:14px 0 22px}
-.hero h1 em{font-style:normal;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;color:transparent}
-.hero p.lead{color:#b9c3dc}
-.hero .btns{display:flex;gap:14px;flex-wrap:wrap;margin:34px 0}
-.trust{display:flex;gap:26px;flex-wrap:wrap;color:#c3cce3;font-size:.9rem;padding-bottom:70px}
-.trust span:before{content:"✓ ";color:var(--gold2);font-weight:700}
-.quote{background:#fff;color:var(--ink);border-radius:22px;padding:32px;box-shadow:0 40px 80px -30px rgba(0,0,0,.6);margin-bottom:70px}
-.quote h3{font-size:1.5rem;margin-bottom:4px}
-.quote p{color:var(--mut);font-size:.9rem;margin-bottom:18px}
-.quote input,.quote select,.quote textarea{width:100%;padding:13px 15px;border:1.5px solid var(--line);border-radius:12px;font:inherit;margin-bottom:12px;background:#fbfbfd}
-.quote input:focus,.quote select:focus,.quote textarea:focus{outline:0;border-color:var(--gold)}
-.quote .btn{width:100%;justify-content:center}
-@media(max-width:900px){.hero .wrap{grid-template-columns:1fr}}
-/* stats */
-.stats{background:var(--ink);color:#fff;padding:0}
-.stats .wrap{display:grid;grid-template-columns:repeat(4,1fr)}
-.stat{padding:42px 20px;text-align:center;border-right:1px solid rgba(255,255,255,.08)}
-.stat:last-child{border:0}
-.stat b{display:block;font-family:'Playfair Display',serif;font-size:2.6rem;color:var(--gold2)}
-.stat span{color:#a8b2cb;font-size:.9rem}
-@media(max-width:700px){.stats .wrap{grid-template-columns:1fr 1fr}.stat{border-bottom:1px solid rgba(255,255,255,.08)}}
-/* services */
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
-.svc{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:32px;transition:.3s;position:relative;overflow:hidden}
-.svc:hover{transform:translateY(-6px);box-shadow:0 30px 50px -28px rgba(15,27,51,.35);border-color:var(--gold)}
-.ico{width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,var(--navy),var(--navy2));display:grid;place-items:center;font-size:1.5rem;margin-bottom:20px}
-.svc h3{font-size:1.35rem;margin-bottom:8px}
-.svc p{color:var(--mut);font-size:.95rem}
-.svc a{display:inline-block;margin-top:16px;color:var(--gold);font-weight:600;font-size:.9rem}
-@media(max-width:900px){.grid3{grid-template-columns:1fr}}
-@media(min-width:620px) and (max-width:900px){.grid3{grid-template-columns:1fr 1fr}}
-/* why */
-.why{background:linear-gradient(180deg,#fff,#f1f2ee)}
-.split{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
-.visual{aspect-ratio:1/1.05;border-radius:26px;background:
-  linear-gradient(160deg,rgba(15,27,51,.2),rgba(15,27,51,.75)),
-  repeating-linear-gradient(135deg,#1b2d55 0 24px,#162649 24px 48px);position:relative;box-shadow:0 40px 70px -30px rgba(15,27,51,.6)}
-.visual .badge{position:absolute;left:24px;bottom:24px;right:24px;background:rgba(255,255,255,.96);border-radius:16px;padding:20px 22px;display:flex;gap:16px;align-items:center}
-.visual .badge b{font-family:'Playfair Display',serif;font-size:2.4rem;color:var(--gold)}
-.visual .tag{position:absolute;top:22px;left:22px;background:var(--gold);color:#fff;padding:6px 14px;border-radius:999px;font-weight:700;font-size:.75rem;letter-spacing:.08em}
-.feat{display:flex;gap:16px;margin-top:26px}
-.feat i{flex:0 0 44px;height:44px;border-radius:50%;background:rgba(31,111,209,.15);color:var(--gold);display:grid;place-items:center;font-style:normal;font-weight:700}
-.feat h4{font-size:1.08rem;margin-bottom:2px}
-.feat p{color:var(--mut);font-size:.94rem}
-@media(max-width:900px){.split{grid-template-columns:1fr}}
-/* process */
-.process{background:var(--navy);color:#fff}
-.process .lead{color:#aeb8d3}
-.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:50px}
-.step{border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:28px;background:rgba(255,255,255,.03)}
-.step b{font-family:'Playfair Display',serif;font-size:2.6rem;color:var(--gold2);display:block;margin-bottom:6px}
-.step p{color:#a8b2cb;font-size:.93rem}
-@media(max-width:900px){.steps{grid-template-columns:1fr 1fr}}
-@media(max-width:520px){.steps{grid-template-columns:1fr}}
-/* reviews */
-.rev{background:#fff;border:1px solid var(--line);border-radius:20px;padding:30px}
-.stars{color:var(--gold);letter-spacing:3px;margin-bottom:12px}
-.rev p{font-size:.98rem;margin-bottom:18px}
-.rev small{color:var(--mut);font-weight:600}
-/* faq */
-details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 24px;margin-top:12px}
-summary{cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between}
-summary:after{content:"+";color:var(--gold);font-size:1.4rem;line-height:1}
-details[open] summary:after{content:"–"}
-details p{color:var(--mut);margin-top:12px}
-.faq{max-width:820px}
-/* cta */
-.cta{background:linear-gradient(135deg,var(--gold),var(--gold2));padding:80px 0;text-align:center;color:#fff}
-.cta h2{margin-bottom:12px}
-.cta .btn{background:var(--ink);color:#fff;margin-top:22px}
-footer{background:var(--ink);color:#99a3bd;padding:64px 0 28px;font-size:.92rem}
-.fgrid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:36px}
-footer h5{color:#fff;margin-bottom:14px;font-size:.95rem}
-footer li{list-style:none;margin-bottom:8px}
-footer a:hover{color:var(--gold2)}
-.copy{border-top:1px solid rgba(255,255,255,.08);margin-top:44px;padding-top:22px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:.82rem}
-@media(max-width:800px){.fgrid{grid-template-columns:1fr 1fr}}
-/* sticky call (mobile) */
-.callbar{display:none}
-@media(max-width:700px){.callbar{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:60}.callbar a{flex:1;text-align:center;padding:16px;font-weight:700}.callbar a:first-child{background:var(--ink);color:#fff}.callbar a:last-child{background:var(--gold);color:#fff}body{padding-bottom:54px}}
-.reveal{opacity:0;transform:translateY(24px);transition:.8s}
-.reveal.in{opacity:1;transform:none}
-.accred{background:#fff;border-bottom:1px solid var(--line)}.accred .wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;padding-top:34px;padding-bottom:34px}.accred div{text-align:center;color:var(--ink)}.accred b{display:block;font-family:"Playfair Display",serif;font-size:1.7rem;color:var(--gold)}.accred span{color:var(--mut);font-size:.88rem}@media(max-width:700px){.accred .wrap{grid-template-columns:1fr}}
-.ba-wrap{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
-.ba{position:relative;aspect-ratio:4/3;border-radius:24px;overflow:hidden;box-shadow:0 40px 70px -30px rgba(15,27,51,.55);user-select:none;--p:50%}
-.ba .pane{position:absolute;inset:0;display:grid;place-items:end start;padding:22px;font-weight:700;letter-spacing:.14em;font-size:.78rem;color:#fff}
-.ba .after{background:linear-gradient(160deg,#1d3c70,#0f1b33),repeating-linear-gradient(135deg,#223 0 20px,#112 20px 40px);background-blend-mode:multiply}
-.ba .before{background:repeating-linear-gradient(135deg,#6e675d 0 18px,#5b554c 18px 36px);clip-path:inset(0 calc(100% - var(--p)) 0 0)}
-.ba .pane span{background:rgba(0,0,0,.55);padding:6px 14px;border-radius:999px}
-.ba .after .pane,.ba .after{place-items:end end}
-.ba .handle{position:absolute;top:0;bottom:0;left:var(--p);width:3px;background:#fff;transform:translateX(-50%);pointer-events:none}
-.ba .handle:after{content:"↔";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:46px;height:46px;border-radius:50%;background:var(--gold);color:#fff;display:grid;place-items:center;font-size:1.2rem;box-shadow:0 8px 20px rgba(0,0,0,.4)}
-.ba input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:ew-resize;margin:0}
-.ba .note{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.92);color:#5d667a;font-size:.72rem;padding:4px 12px;border-radius:999px;white-space:nowrap}
-@media(max-width:900px){.ba-wrap{grid-template-columns:1fr}}
-</style>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
@@ -156,7 +22,7 @@ footer a:hover{color:var(--gold2)}
 
 <header><div class="wrap"><nav>
   <a class="logo" href="#top"><i>GQ</i><span>GQ &amp; Sons<small>ROOFING &amp; BUILDING LTD</small></span></a>
-  <div class="links"><a href="#services">Services</a><a href="#why">Why Us</a><a href="#process">Process</a><a href="#results">Our Work</a><a href="#reviews">Reviews</a><a href="#faq">FAQ</a></div>
+  <div class="links"><a href="#services">Services</a><a href="#why">Why Us</a><a href="#process">Process</a><a href="gallery.html">Gallery</a><a href="#reviews">Reviews</a><a href="#faq">FAQ</a></div>
   <a class="btn btn-gold nav-cta" href="#quote">Free Quote</a>
 </nav></div></header>
 
@@ -200,14 +66,14 @@ footer a:hover{color:var(--gold2)}
   <h2>Our roofing &amp; building services</h2>
   <p class="lead">Flat roofs, pitched roofs, leadwork and more — one trusted family team.</p>
   <div class="grid3">
-    <div class="svc reveal"><div class="ico">🧪</div><h3>Polyroof GRP</h3><p>Advanced, durable flat roofing solutions that provide long-lasting protection for your property.</p><a href="#quote">View more →</a></div>
-    <div class="svc reveal"><div class="ico">🔩</div><h3>Polyroof Zinc &amp; Lead Replica</h3><p>Add real character to your Polyroof Protec flat roof system with Zinc or Lead Roof trims.</p><a href="#quote">View more →</a></div>
-    <div class="svc reveal"><div class="ico">🌡️</div><h3>Warm Roofs</h3><p>Insulated, energy-efficient roofing systems keeping buildings warm in winter and cool in summer.</p><a href="#quote">View more →</a></div>
-    <div class="svc reveal"><div class="ico">🏠</div><h3>Tiling &amp; Slating</h3><p>Traditional and modern roof tiling and slating to enhance the look and durability of your property.</p><a href="#quote">View more →</a></div>
-    <div class="svc reveal"><div class="ico">🛡️</div><h3>Leadwork</h3><p>Skilled operatives install traditional sheet lead that is highly resistant and lasts for decades when properly installed.</p><a href="#quote">View more →</a></div>
-    <div class="svc reveal"><div class="ico">🏙️</div><h3>Balustrades, Balconies &amp; Terraces</h3><p>Custom-designed, professionally installed structures that add style and safety to your outdoor spaces.</p><a href="#quote">View more →</a></div>
-    <div class="svc reveal"><div class="ico">📋</div><h3>Felt Roofs</h3><p>Reliable, cost-effective felt roofing systems installed to a high standard for lasting weather protection.</p><a href="#quote">View more →</a></div>
-    <div class="svc reveal"><div class="ico">🧰</div><h3>Spray Foam Insulation Removal</h3><p>Safe, professional removal of spray foam insulation from roof spaces, helping restore mortgageability and roof health.</p><a href="#quote">View more →</a></div>
+    <div class="svc reveal"><div class="ico">🧪</div><h3>Polyroof GRP</h3><p>Advanced, durable flat roofing solutions that provide long-lasting protection for your property.</p><a href="polyroof-grp.html">View more →</a></div>
+    <div class="svc reveal"><div class="ico">🔩</div><h3>Polyroof Zinc &amp; Lead Replica</h3><p>Add real character to your Polyroof Protec flat roof system with Zinc or Lead Roof trims.</p><a href="polyroof-zinc-lead-replica.html">View more →</a></div>
+    <div class="svc reveal"><div class="ico">🌡️</div><h3>Warm Roofs</h3><p>Insulated, energy-efficient roofing systems keeping buildings warm in winter and cool in summer.</p><a href="warm-roofs.html">View more →</a></div>
+    <div class="svc reveal"><div class="ico">🏠</div><h3>Tiling &amp; Slating</h3><p>Traditional and modern roof tiling and slating to enhance the look and durability of your property.</p><a href="tiling-and-slating.html">View more →</a></div>
+    <div class="svc reveal"><div class="ico">🛡️</div><h3>Leadwork</h3><p>Skilled operatives install traditional sheet lead that is highly resistant and lasts for decades when properly installed.</p><a href="leadwork.html">View more →</a></div>
+    <div class="svc reveal"><div class="ico">🏙️</div><h3>Balustrades, Balconies &amp; Terraces</h3><p>Custom-designed, professionally installed structures that add style and safety to your outdoor spaces.</p><a href="balustrades-balconies-terraces.html">View more →</a></div>
+    <div class="svc reveal"><div class="ico">📋</div><h3>Felt Roofs</h3><p>Reliable, cost-effective felt roofing systems installed to a high standard for lasting weather protection.</p><a href="felt-roofs.html">View more →</a></div>
+    <div class="svc reveal"><div class="ico">🧰</div><h3>Spray Foam Insulation Removal</h3><p>Safe, professional removal of spray foam insulation from roof spaces, helping restore mortgageability and roof health.</p><a href="spray-foam-insulation-removal.html">View more →</a></div>
     <div class="svc reveal" style="background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff"><div class="ico" style="background:rgba(255,255,255,.12)">📞</div><h3>Not sure what you need?</h3><p style="color:#b9c3dc">Call us for friendly, honest advice and a free quote.</p><a href="tel:01753851156" style="color:var(--gold2)">01753 851156 →</a></div>
   </div></div></section>
 
