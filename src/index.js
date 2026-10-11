@@ -1,6 +1,6 @@
 // Zero-dependency Slack lead claimer: Socket Mode over WebSocket + Web API over fetch.
 // Press On in Bot Control -> claims the NEXT lead in watched channels with a lowercase "t" (as you),
-// replies ~700-900ms after the lead, then turns itself off.
+// replies the instant the lead arrives (INSTANT mode), then turns itself off.
 const fs = require("node:fs");
 const path = require("node:path");
 
@@ -27,7 +27,7 @@ if (!/^[CG][A-Z0-9]+$/.test(CONTROL_CHANNEL)) problems.push("CONTROL_CHANNEL mus
 if (problems.length) throw new Error("Fix your .env file:\n - " + problems.join("\n - "));
 
 const CLAIM_TEXT = "t"; // the reply is always exactly "t"
-const INSTANT = false; // true = reply the moment the lead arrives; false = timed reply (below)
+const INSTANT = true; // true = reply the moment the lead arrives (no delay, no checks in the way); false = timed reply (below)
 const MIN_MS = 700, MAX_MS = 900, TARGET_MS = 780; // timed mode: the first reply lands this long after the lead
 const matcher = CLAIM_MATCH ? new RegExp(CLAIM_MATCH, "i") : null;
 const log = (...a) => console.log(new Date().toLocaleTimeString(), ...a);
