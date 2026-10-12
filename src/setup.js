@@ -2,7 +2,7 @@
 // Run it with:  node src/setup.js
 const fs = require("node:fs");
 const path = require("node:path");
-const { spawn } = require("node:child_process");
+const { spawn, execFileSync } = require("node:child_process");
 
 const ROOT = path.join(__dirname, "..");
 const ENV_FILE = path.join(ROOT, ".env");
@@ -83,19 +83,42 @@ const why = (e) => PLAIN[e.message] || e.message;
 async function main() {
   const old = parseEnv(fs.existsSync(ENV_FILE) ? fs.readFileSync(ENV_FILE, "utf8") : "");
   console.log("\n=== Lead Claimer setup ===\n");
-  console.log("I will ask for 3 keys. Copy each one from Slack, click here, paste it, then press Enter.");
-  console.log("When you paste, you will see a row of ******** stars. That means it worked. Then press Enter once.\n");
+  console.log("I will ask for 3 keys, one at a time.");
+  console.log("Just click Copy in Slack. I notice it by myself. You do not need to paste or type anything here.\n");
 
-  // Asks until a key with the right start is pasted. Empty or wrong pastes just re-ask (nothing aborts).
-  // After 2 failed tries the paste is shown on screen, in case the hidden box is the problem.
+  // Clipboard mode (Mac / Windows): you only click Copy in Slack. The setup notices the copied key by itself,
+  // so nothing has to be pasted into this window. Falls back to typing if the clipboard can't be read.
+  const readClip = () => {
+    try {
+      if (process.env.SETUP_CLIP_FILE) return fs.readFileSync(process.env.SETUP_CLIP_FILE, "utf8").replace(/\s+/g, "");
+      const o = process.platform === "darwin" ? execFileSync("pbpaste", { timeout: 2000 })
+        : process.platform === "win32" ? execFileSync("powershell", ["-NoProfile", "-Command", "Get-Clipboard"], { timeout: 4000 }) : null;
+      return o === null ? null : o.toString().replace(/\s+/g, "");
+    } catch { return null; }
+  };
+  const clipOK = readClip() !== null;
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   async function askKey(label, prefixes, hint) {
+    if (clipOK) {
+      console.log(`   Waiting... go to Slack and click Copy. I will notice by myself (nothing to paste here).`);
+      let last = "";
+      for (;;) {
+        const v = readClip();
+        if (v && v !== last && prefixes.some((p) => v.startsWith(p))) {
+          console.log(`   ✅ Got it: ${v.slice(0, 5)}... (${v.length} characters).\n`);
+          return v;
+        }
+        if (v && v !== last && v.length > 8) { console.log(`   (That copied text starts with "${v.slice(0, 5)}", not ${prefixes[0]}. ${hint})`); }
+        last = v || last;
+        await sleep(400);
+      }
+    }
     let tries = 0;
     for (;;) {
       const v = await ask("   Paste it, then press Enter: ", tries < 2);
       if (prefixes.some((p) => v.startsWith(p))) { console.log(`   Got it: ${v.slice(0, 5)}... (${v.length} characters).\n`); return v; }
       tries++;
-      console.log(v ? `   That starts with "${v.slice(0, 5)}", not ${prefixes[0]}. ${hint}` : `   Nothing arrived. Click this window, then press Cmd+V (Ctrl+V on Windows), then Enter.`);
-      if (tries === 2) console.log("   (From now on you will SEE what you paste, so we can tell what is wrong.)");
+      console.log(v ? `   That starts with "${v.slice(0, 5)}", not ${prefixes[0]}. ${hint}` : `   Nothing arrived.`);
       console.log("");
     }
   }
@@ -106,11 +129,11 @@ async function main() {
 
   console.log("2 of 3. BOT token (starts with xoxb-)");
   console.log("   Get it: https://api.slack.com/apps/A0C7LJX5UAY/install-on-team  ->  Bot User OAuth Token  ->  Copy");
-  let bot = await askKey("BOT", ["xoxb-", "xoxp-"], "Copy the Bot User OAuth Token.");
+  let bot = await askKey("BOT", ["xoxb-"], "Copy the Bot User OAuth Token.");
 
   console.log("3 of 3. USER token (starts with xoxp-)");
   console.log("   Get it: the same page  ->  User OAuth Token  ->  Copy");
-  let usr = await askKey("USER", ["xoxp-", "xoxb-"], "Copy the User OAuth Token.");
+  let usr = await askKey("USER", ["xoxp-"], "Copy the User OAuth Token.");
 
   if (bot.startsWith("xoxp-") && usr.startsWith("xoxb-")) { [bot, usr] = [usr, bot]; console.log("(You pasted the bot and user keys the wrong way round. I fixed that.)\n"); }
 
@@ -153,6 +176,7 @@ async function main() {
   if (channels) lines.push(`CLAIM_CHANNELS=${channels}`);
   fs.writeFileSync(ENV_FILE, lines.join("\n") + "\n");
   console.log("\n✅ Saved your settings.");
+  try { if (process.platform === "darwin") execFileSync("pbcopy", { input: "" }); } catch {}
 
   finishedInput = true;
   if (stdin.isTTY) stdin.setRawMode(false);
