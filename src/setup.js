@@ -2,27 +2,51 @@
 // Run it with:  node src/setup.js
 const fs = require("node:fs");
 const path = require("node:path");
-const readline = require("node:readline");
-const { Writable } = require("node:stream");
 const { spawn } = require("node:child_process");
 
 const ROOT = path.join(__dirname, "..");
 const ENV_FILE = path.join(ROOT, ".env");
 
 // ---------- tiny helpers ----------
-let muted = false;
-const out = new Writable({ write(chunk, enc, cb) { if (!muted) process.stdout.write(chunk, enc); cb(); } });
-const rl = readline.createInterface({ input: process.stdin, output: out, terminal: !!process.stdin.isTTY });
-let finishedInput = false;
-rl.on("close", () => { if (!finishedInput) { console.log("\nSetup was interrupted before it finished. Nothing was changed."); process.exit(1); } });
-const ask = (question, hidden = false) =>
+// Reads typed/pasted lines straight from the keyboard (no readline), so a stray extra Enter that comes
+// with a paste can never answer the next question by mistake, and the window can't close by itself.
+const stdin = process.stdin;
+let finishedInput = false, buf = "", ended = false;
+const lines = [], waiters = [];
+function pump() {
+  while (waiters.length && lines.length) waiters.shift()(lines.shift());
+  if (ended && !finishedInput && waiters.length) { console.log("\nSetup was interrupted before it finished. Nothing was changed."); process.exit(1); }
+}
+if (stdin.isTTY) stdin.setRawMode(true);
+stdin.setEncoding("utf8");
+stdin.on("data", (chunk) => {
+  chunk = chunk.replace(/\x1b\[20[01]~/g, "");
+  for (const ch of chunk) {
+    if (ch === "\x03" || ch === "\x04") { console.log("\nStopped. Nothing was changed."); process.exit(1); }
+    if (ch === "\r" || ch === "\n") { if (shown) process.stdout.write("\n"); lines.push(buf); buf = ""; continue; }
+    if (ch === "\x7f" || ch === "\b") { buf = buf.slice(0, -1); continue; }
+    if (ch < " ") continue;
+    buf += ch;
+    if (shown) process.stdout.write(ch);
+  }
+  pump();
+});
+stdin.on("end", () => { ended = true; pump(); });
+let shown = false;
+// allowEmpty=false: blank lines are ignored and we keep waiting for a real answer.
+const nextLine = (echo, allowEmpty) =>
   new Promise((resolve) => {
-    process.stdout.write(question);
-    muted = hidden;
-    rl.question("", (answer) => { muted = false; process.stdout.write("\n"); resolve(answer.replace(/\s+/g, "")); });
+    shown = echo;
+    const take = (l) => { l = l.trim(); if (!l && !allowEmpty) { waiters.push(take); pump(); return; } shown = false; resolve(l); };
+    waiters.push(take); pump();
   });
-const askLine = (question) =>
-  new Promise((resolve) => { process.stdout.write(question); rl.question("", (a) => resolve(a.trim())); });
+const ask = async (question, hidden = false) => {
+  process.stdout.write(question);
+  const v = (await nextLine(!hidden, false)).replace(/\s+/g, "");
+  if (hidden) process.stdout.write("\n");
+  return v;
+};
+const askLine = async (question) => { process.stdout.write(question); return nextLine(true, false); };
 
 function parseEnv(text) {
   const o = {};
@@ -130,7 +154,8 @@ async function main() {
   console.log("\n✅ Saved your settings.");
 
   finishedInput = true;
-  rl.close();
+  if (stdin.isTTY) stdin.setRawMode(false);
+  stdin.pause();
   if (process.env.SETUP_NO_START) return;
   console.log("Starting the bot now. Keep this window open. In Slack, bot-controll will say 'Lead claimer is online'; then press On.\n");
   const args = [process.execPath, "--env-file=.env", path.join("src", "index.js")];
