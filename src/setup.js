@@ -27,22 +27,23 @@ stdin.on("data", (chunk) => {
     if (ch === "\x7f" || ch === "\b") { buf = buf.slice(0, -1); continue; }
     if (ch < " ") continue;
     buf += ch;
-    if (shown) process.stdout.write(ch);
+    if (shown) process.stdout.write(shown === "mask" ? "*" : ch);
   }
+  if (shown === "mask" && buf.length > 20 && !told) { told = true; process.stdout.write("  <- received. Now press Enter.\n"); }
   pump();
 });
 stdin.on("end", () => { ended = true; pump(); });
-let shown = false;
+let shown = false, told = false;
 // allowEmpty=false: blank lines are ignored and we keep waiting for a real answer.
 const nextLine = (echo, allowEmpty) =>
   new Promise((resolve) => {
-    shown = echo;
+    shown = echo; told = false;
     const take = (l) => { l = l.trim(); if (!l && !allowEmpty) { waiters.push(take); pump(); return; } shown = false; resolve(l); };
     waiters.push(take); pump();
   });
 const ask = async (question, hidden = false) => {
   process.stdout.write(question);
-  const v = (await nextLine(!hidden, false)).replace(/\s+/g, "");
+  const v = (await nextLine(hidden ? "mask" : true, false)).replace(/\s+/g, "");
   if (hidden) process.stdout.write("\n");
   return v;
 };
@@ -83,7 +84,7 @@ async function main() {
   const old = parseEnv(fs.existsSync(ENV_FILE) ? fs.readFileSync(ENV_FILE, "utf8") : "");
   console.log("\n=== Lead Claimer setup ===\n");
   console.log("I will ask for 3 keys. Copy each one from Slack, click here, paste it, then press Enter.");
-  console.log("You will NOT see the key appear on screen when you paste. That is normal and keeps it private.\n");
+  console.log("When you paste, you will see a row of ******** stars. That means it worked. Then press Enter once.\n");
 
   // Asks until a key with the right start is pasted. Empty or wrong pastes just re-ask (nothing aborts).
   // After 2 failed tries the paste is shown on screen, in case the hidden box is the problem.
