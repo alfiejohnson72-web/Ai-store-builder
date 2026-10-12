@@ -20,3 +20,10 @@ The bot posts a panel in Bot Control with **On** and **Off** buttons.
 Text commands (only you are obeyed): `on`, `off`, `status`, `watch #channel`, `unwatch #channel`.
 
 Bot- or form-posted leads are claimed too. Set `CLAIM_MATCH` (regex) if a channel has non-lead chatter.
+
+## Running on a server in Virginia (fastest)
+1. Render dashboard -> **New +** -> **Blueprint** -> connect this repository (GitHub).
+2. Render reads `render.yaml` and asks for the six values marked `sync: false` (the three Slack keys, `CLAIM_USER_ID`, `CONTROL_CHANNEL`, `CLAIM_CHANNELS`).
+3. Apply. Open the worker's **Logs**; wait for "Connected.". In Bot Control, press **On**.
+4. Type `ping` in Bot Control to see the round trip to Slack from the server, and compare with your own computer.
+Stop any copy running on your own computer first: only one copy may run at a time.

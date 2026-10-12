@@ -150,6 +150,24 @@ const hint = (msg) => {
   return HINTS[code] ? `${msg} (${HINTS[code]})` : msg;
 };
 
+// Measure the real round trip from wherever this bot runs to Slack (lower = faster).
+async function pingSlack() {
+  const times = [];
+  for (let i = 0; i < 7; i++) {
+    const t0 = Date.now();
+    try {
+      await slack("auth.test", SLACK_USER_TOKEN, {}, 4000);
+      times.push(Date.now() - t0);
+    } catch {}
+    await new Promise((r) => setTimeout(r, 120));
+  }
+  times.shift(); // the first call includes setting up the connection
+  const where = process.env.RENDER ? "the Render server" : `this computer (${require("node:os").hostname()})`;
+  if (!times.length) return say(`⚠️ Could not measure the speed to Slack from ${where}.`);
+  const avg = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
+  await say(`🏓 Round trip to Slack from ${where}: best ${Math.min(...times)}ms, average ${avg}ms, worst ${Math.max(...times)}ms. Lower is faster.`);
+}
+
 // Check every key and every watched channel; report in Bot Control.
 async function selfCheck() {
   const lines = [];
@@ -315,8 +333,10 @@ function control(event) {
     reply = `🚫 Never replying to: ${[...NEVER_REPLY_NAMES, ...state.ignoredNames, ...state.ignoredUsers.map((u) => `<@${u}>`)].join(", ")}`;
   } else if (cmd === "check") {
     after = selfCheck;
+  } else if (cmd === "ping") {
+    after = pingSlack;
   } else if (cmd === "status") {
-    reply = `${state.armed ? "🟢 ON" : "🔴 OFF"} · reply "${CLAIM_TEXT}" ${INSTANT ? "INSTANT" : `at ${MIN_MS}-${MAX_MS}ms`} · watching: ${state.channels.map((c) => `<#${c}>`).join(", ") || "nothing yet"} · replies only to ${state.leadBotId ? "AIBot (locked to its app ID)" : "AIBot"}\nCommands: on, off, status, check, watch #channel, unwatch #channel, ignore @person, unignore @person, ignored`;
+    reply = `${state.armed ? "🟢 ON" : "🔴 OFF"} · reply "${CLAIM_TEXT}" ${INSTANT ? "INSTANT" : `at ${MIN_MS}-${MAX_MS}ms`} · watching: ${state.channels.map((c) => `<#${c}>`).join(", ") || "nothing yet"} · replies only to ${state.leadBotId ? "AIBot (locked to its app ID)" : "AIBot"}\nCommands: on, off, status, check, ping, watch #channel, unwatch #channel, ignore @person, unignore @person, ignored`;
   } else {
     panel();
     return;

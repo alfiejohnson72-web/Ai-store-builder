@@ -1,0 +1,27 @@
+# Render Blueprint: sets up the lead claimer on a server in Virginia (next to Slack) with one click.
+# Render -> New -> Blueprint -> pick this repo. Render asks you for the values marked "sync: false".
+services:
+  - type: worker
+    name: lead-claimer
+    runtime: node
+    region: virginia
+    plan: starter
+    branch: claude/intelligent-turing-0qpxxz
+    buildCommand: npm install
+    startCommand: node src/index.js
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: SLACK_APP_TOKEN
+        sync: false
+      - key: SLACK_BOT_TOKEN
+        sync: false
+      - key: SLACK_USER_TOKEN
+        sync: false
+      - key: CLAIM_USER_ID
+        sync: false
+      - key: CONTROL_CHANNEL
+        sync: false
+      - key: CLAIM_CHANNELS
+        sync: false
