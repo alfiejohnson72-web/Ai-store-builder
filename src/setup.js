@@ -61,21 +61,31 @@ async function main() {
   console.log("I will ask for 3 keys. Copy each one from Slack, click here, paste it, then press Enter.");
   console.log("You will NOT see the key appear on screen when you paste. That is normal and keeps it private.\n");
 
-  let app, bot, usr;
+  // Asks until a key with the right start is pasted. Empty or wrong pastes just re-ask (nothing aborts).
+  // After 2 failed tries the paste is shown on screen, in case the hidden box is the problem.
+  async function askKey(label, prefixes, hint) {
+    let tries = 0;
+    for (;;) {
+      const v = await ask("   Paste it, then press Enter: ", tries < 2);
+      if (prefixes.some((p) => v.startsWith(p))) { console.log(`   Got it: ${v.slice(0, 5)}... (${v.length} characters).\n`); return v; }
+      tries++;
+      console.log(v ? `   That starts with "${v.slice(0, 5)}", not ${prefixes[0]}. ${hint}` : `   Nothing arrived. Click this window, then press Cmd+V (Ctrl+V on Windows), then Enter.`);
+      if (tries === 2) console.log("   (From now on you will SEE what you paste, so we can tell what is wrong.)");
+      console.log("");
+    }
+  }
+
   console.log("1 of 3. APP token (starts with xapp-)");
   console.log("   Get it: https://api.slack.com/apps/A0C7LJX5UAY/general  ->  App-Level Tokens  ->  socket  ->  Copy");
-  app = await ask("   Paste it, then press Enter: ", true);
-  console.log(app ? `   Got it (${app.length} characters).\n` : "   (nothing pasted)\n");
+  const app = await askKey("APP", ["xapp-"], "Copy the App-Level Token.");
 
   console.log("2 of 3. BOT token (starts with xoxb-)");
   console.log("   Get it: https://api.slack.com/apps/A0C7LJX5UAY/install-on-team  ->  Bot User OAuth Token  ->  Copy");
-  bot = await ask("   Paste it, then press Enter: ", true);
-  console.log(bot ? `   Got it (${bot.length} characters).\n` : "   (nothing pasted)\n");
+  let bot = await askKey("BOT", ["xoxb-", "xoxp-"], "Copy the Bot User OAuth Token.");
 
   console.log("3 of 3. USER token (starts with xoxp-)");
   console.log("   Get it: the same page  ->  User OAuth Token  ->  Copy");
-  usr = await ask("   Paste it, then press Enter: ", true);
-  console.log(usr ? `   Got it (${usr.length} characters).\n` : "   (nothing pasted)\n");
+  let usr = await askKey("USER", ["xoxp-", "xoxb-"], "Copy the User OAuth Token.");
 
   if (bot.startsWith("xoxp-") && usr.startsWith("xoxb-")) { [bot, usr] = [usr, bot]; console.log("(You pasted the bot and user keys the wrong way round. I fixed that.)\n"); }
 
