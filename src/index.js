@@ -113,14 +113,15 @@ function alertOnce(key, text) {
   say(text);
 }
 
-// A lead is ONLY a message posted by the AIBot app. Messages from people and from any other app are never claimed.
-// Once the first real AIBot lead is claimed, the bot remembers AIBot's app ID and from then on accepts only that exact app.
+// A lead is ONLY a "New Lead Alert" message posted by the AIBot app. Messages from people, from any other app,
+// and any other AIBot message are never claimed. Once the first real AIBot lead is claimed, the bot remembers
+// AIBot's app ID and from then on accepts only that exact app.
 function isLeadAlert(e) {
   if (!e.bot_id) return false; // posted by a person, not an app
+  if (!/new lead alert/i.test(fullText(e))) return false; // must be a lead alert
   if (state.leadBotId) return e.bot_id === state.leadBotId;
   const names = [e.bot_profile && e.bot_profile.name, e.username].filter(Boolean).map((n) => String(n).toLowerCase());
-  if (names.length) return names.includes(LEAD_BOT_NAME); // a name is shown: it must be AIBot
-  return /new lead alert/i.test(fullText(e)); // no name shown by Slack: fall back on the alert text
+  return !names.length || names.includes(LEAD_BOT_NAME); // a name is shown: it must be AIBot
 }
 
 // True if this message is from (or about) someone on the never-reply list.
@@ -133,6 +134,14 @@ function isIgnored(e) {
 
 function fullText(e) {
   const parts = [e.text, ...(e.attachments || []).flatMap((a) => [a.pretext, a.title, a.text, a.fallback])];
+  const walk = (b) => { // text inside Slack "blocks" (some apps put the message only there)
+    if (!b || typeof b !== "object") return;
+    if (Array.isArray(b)) return b.forEach(walk);
+    if (typeof b.text === "string") parts.push(b.text);
+    for (const k of ["text", "fields", "elements", "blocks"]) if (b[k] && typeof b[k] === "object") walk(b[k]);
+  };
+  walk(e.blocks);
+  (e.attachments || []).forEach((a) => walk(a.blocks));
   return parts.filter(Boolean).join("\n");
 }
 
@@ -197,15 +206,10 @@ async function selfCheck() {
 }
 
 // ---------- claiming ----------
-// How many "t" replies to send: 20% just one, 80% two to four (max 4), like quick manual spamming.
+// How many "t" replies to send: always exactly one.
 const config = { forceCount: null }; // tests only
-function pickReplyCount(rand = Math.random) {
-  if (config.forceCount) return config.forceCount;
-  const r = rand();
-  if (r < 0.2) return 1;
-  if (r < 0.6) return 2; // 40%
-  if (r < 0.88) return 3; // 28%
-  return 4; // 12%
+function pickReplyCount() {
+  return config.forceCount || 1;
 }
 // Follow-up "t"s after the first, a fraction of a second apart. Never affects the claim itself.
 async function sendFollowUps(event, count) {
@@ -336,7 +340,7 @@ function control(event) {
   } else if (cmd === "ping") {
     after = pingSlack;
   } else if (cmd === "status") {
-    reply = `${state.armed ? "🟢 ON" : "🔴 OFF"} · reply "${CLAIM_TEXT}" ${INSTANT ? "INSTANT" : `at ${MIN_MS}-${MAX_MS}ms`} · watching: ${state.channels.map((c) => `<#${c}>`).join(", ") || "nothing yet"} · replies only to ${state.leadBotId ? "AIBot (locked to its app ID)" : "AIBot"}\nCommands: on, off, status, check, ping, watch #channel, unwatch #channel, ignore @person, unignore @person, ignored`;
+    reply = `${state.armed ? "🟢 ON" : "🔴 OFF"} · reply "${CLAIM_TEXT}" ${INSTANT ? "INSTANT" : `at ${MIN_MS}-${MAX_MS}ms`} · watching: ${state.channels.map((c) => `<#${c}>`).join(", ") || "nothing yet"} · replies once, only to AIBot "New Lead Alert" messages${state.leadBotId ? " (locked to its app ID)" : ""}\nCommands: on, off, status, check, ping, watch #channel, unwatch #channel, ignore @person, unignore @person, ignored`;
   } else {
     panel();
     return;
