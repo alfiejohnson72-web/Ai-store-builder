@@ -144,10 +144,11 @@ async function main() {
   if (problems.length) { console.log("Problem:\n - " + problems.join("\n - ") + "\n\nRun the same command again and paste the right keys.\n"); process.exit(1); }
 
   // The three IDs: keep the ones already saved, otherwise ask.
-  let userId = old.CLAIM_USER_ID, control = old.CONTROL_CHANNEL, channels = old.CLAIM_CHANNELS;
-  if (!userId) userId = await askLine("Your Slack member ID (starts with U): ");
-  if (!control) control = await askLine("The bot-controll channel ID (starts with C): ");
-  if (!channels) channels = await askLine("The lead channel ID to watch (optin-leads-1, starts with C; or leave empty): ");
+  // Known IDs for this workspace (the user token check below corrects the member ID if it differs).
+  const userId0 = old.CLAIM_USER_ID || "U0BUCGTQR26";
+  let userId = userId0;
+  const control = old.CONTROL_CHANNEL || "C0C7BBJPFEZ";
+  const channels = old.CLAIM_CHANNELS || "C0BHD760MKN";
 
   console.log("Checking your keys with Slack...");
   let bad = false;
