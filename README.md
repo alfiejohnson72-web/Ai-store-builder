@@ -2,6 +2,13 @@
 
 When a new lead lands in a channel you're watching, this replies a lowercase **t** in its thread as you, within a second. You manage it from your own **Bot Control** channel. No SDK, no dependencies (Node 22+, works on Mac and Windows).
 
+## Windows: one line in PowerShell
+Open PowerShell and run:
+```
+irm https://raw.githubusercontent.com/alfiejohnson72-web/Ai-store-builder/claude/intelligent-turing-0qpxxz/windows.ps1 | iex
+```
+It installs Node.js if needed, downloads the newest bot to `%USERPROFILE%\LeadClaimer`, asks for your 3 Slack keys the first time, keeps the PC awake and starts the bot. Run the same line again any time to update and restart (your keys are kept).
+
 ## Setup
 1. Create a private channel called **Bot Control**.
 2. https://api.slack.com/apps → **Create New App → From manifest** → paste `manifest.json`.
