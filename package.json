@@ -1,8 +1,14 @@
 {
   "name": "slack-thread-claimer",
   "version": "1.0.0",
-  "description": "Instantly claims new Slack threads by replying as you (no dependencies)",
+  "description": "Claims the next Slack lead by replying \"t\" as you (no dependencies)",
   "main": "src/index.js",
-  "engines": { "node": ">=22" },
-  "scripts": { "start": "node --env-file=.env src/index.js" }
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node --env-file=.env src/index.js",
+    "test": "node --test \"test/*.test.js\"",
+    "setup": "node src/setup.js"
+  }
 }
