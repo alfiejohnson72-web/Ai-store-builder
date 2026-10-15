@@ -32,7 +32,8 @@ const lead = (extra = {}) => ({
 
 (async () => {
   let n = 0;
-  const test = async (name, fn) => { calls.length = 0; bot.state.armed = false; bot.state.leadBotId = null; await fn(); console.log("ok -", name); n++; };
+  const test = async (name, fn) => { calls.length = 0; bot.state.armed = false; bot.state.armedSecond = false; bot.state.second = null; bot.state.leadBotId = null; await fn(); console.log("ok -", name); n++; };
+  const withSecond = () => { bot.state.second = "COPT2"; if (!bot.state.channels.includes("COPT2")) bot.state.channels.push("COPT2"); };
 
   await test("replies exactly one 't' to an AIBot lead, then turns OFF", async () => {
     bot.arm();
@@ -102,6 +103,65 @@ const lead = (extra = {}) => ({
     bot.arm();
     await bot.claim(lead({ bot_id: "BFAKE" }));
     assert.strictEqual(tReplies().length, 0);
+  });
+
+  await test("second channel: an optin-2 lead turns off only optin-2, optin-1 stays ON", async () => {
+    withSecond();
+    bot.arm();
+    await bot.claim(lead({ channel: "COPT2", ts: "3.1" }));
+    assert.strictEqual(tReplies().length, 1);
+    assert.strictEqual(bot.state.armed, true);
+    assert.strictEqual(bot.state.armedSecond, false);
+    await bot.claim(lead({ channel: "COPT2", ts: "3.2" })); // optin-2 is done until On is pressed again
+    assert.strictEqual(tReplies().length, 1);
+    await bot.claim(lead({ ts: "3.3" })); // optin-1 still claims
+    assert.strictEqual(tReplies().length, 2);
+    assert.strictEqual(tReplies()[1].body.channel, "CLEADS");
+    assert.strictEqual(bot.state.armed, false);
+  });
+
+  await test("second channel: an optin-1 lead turns off optin-2 as well", async () => {
+    withSecond();
+    bot.arm();
+    await bot.claim(lead({ ts: "4.1" }));
+    assert.strictEqual(bot.state.armed, false);
+    assert.strictEqual(bot.state.armedSecond, false);
+    await bot.claim(lead({ channel: "COPT2", ts: "4.2" }));
+    assert.strictEqual(tReplies().length, 1);
+  });
+
+  await test("second channel: pressing On again re-arms optin-2", async () => {
+    withSecond();
+    bot.arm();
+    await bot.claim(lead({ channel: "COPT2", ts: "5.1" }));
+    bot.arm();
+    assert.strictEqual(bot.state.armedSecond, true);
+    await bot.claim(lead({ channel: "COPT2", ts: "5.2" }));
+    assert.strictEqual(tReplies().length, 2);
+    assert.strictEqual(bot.state.armed, true);
+  });
+
+  await test("without a second channel, a lead in any watched channel turns everything OFF", async () => {
+    if (!bot.state.channels.includes("COPT2")) bot.state.channels.push("COPT2");
+    bot.arm();
+    await bot.claim(lead({ channel: "COPT2", ts: "6.1" }));
+    assert.strictEqual(bot.state.armed, false);
+    await bot.claim(lead({ ts: "6.2" }));
+    assert.strictEqual(tReplies().length, 1);
+  });
+
+  await test("'second #channel' and 'second off' commands from Bot Control", async () => {
+    bot.control({ channel: "CCTRL", user: "UME", ts: "7.1", text: "second <#COPT9|optin-2>" });
+    assert.strictEqual(bot.state.second, "COPT9");
+    assert.ok(bot.state.channels.includes("COPT9"));
+    bot.control({ channel: "CCTRL", user: "UME", ts: "7.2", text: "on" });
+    assert.strictEqual(bot.state.armedSecond, true);
+    bot.control({ channel: "CCTRL", user: "UME", ts: "7.3", text: "second off" });
+    assert.strictEqual(bot.state.second, null);
+    assert.strictEqual(bot.state.armedSecond, false);
+    bot.control({ channel: "CCTRL", user: "UME", ts: "7.4", text: "off" });
+    assert.strictEqual(bot.state.armed, false);
+    await wait(100);
   });
 
   console.log(`\nAll ${n} tests passed.`);

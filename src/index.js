@@ -44,7 +44,8 @@ function startTimers() { for (const [fn, ms] of timerJobs) setInterval(fn, ms); 
 // ---------- state (written atomically so a crash can't corrupt it) ----------
 const STATE_FILE = path.join(__dirname, "..", "state.json");
 const NEVER_REPLY_NAMES = ["Jase Chijioke"]; // built in: never reply to this person, or to alerts naming them
-const state = { armed: false, armedAt: "0", leadBotId: null, ignoredUsers: [], ignoredNames: [], channels: CLAIM_CHANNELS.split(",").map((s) => s.trim()).filter(Boolean) };
+// Optional second channel (e.g. optin-2): claiming there turns off only that channel; claiming anywhere else turns off both.
+const state = { armed: false, armedAt: "0", second: null, armedSecond: false, armedSecondAt: "0", leadBotId: null, ignoredUsers: [], ignoredNames: [], channels: CLAIM_CHANNELS.split(",").map((s) => s.trim()).filter(Boolean) };
 try {
   Object.assign(state, JSON.parse(fs.readFileSync(STATE_FILE, "utf8")));
 } catch {}
@@ -58,10 +59,28 @@ function save() {
   }
 }
 function arm() {
-  if (!state.armed) state.armedAt = ((Date.now() + clockOffset) / 1000 - 1).toFixed(6); // Slack's clock, 1s margin
+  const now = ((Date.now() + clockOffset) / 1000 - 1).toFixed(6); // Slack's clock, 1s margin
+  if (!state.armed) state.armedAt = now;
+  if (state.second && !state.armedSecond) state.armedSecondAt = now;
   state.armed = true;
+  state.armedSecond = !!state.second;
   save();
 }
+function disarm() {
+  state.armed = false;
+  state.armedSecond = false;
+  save();
+}
+const isSecond = (channel) => !!state.second && channel === state.second;
+const armedFor = (channel) => (isSecond(channel) ? state.armedSecond : state.armed);
+// What is armed right now, in words, for Bot Control.
+function armedText(bold = "") {
+  if (!state.armed) return `🔴 ${bold}OFF${bold}`;
+  if (!state.second) return `🟢 ${bold}ON${bold}: claiming the next lead`;
+  const others = state.channels.filter((c) => c !== state.second).map((c) => `<#${c}>`).join(", ") || "your other channels";
+  return `🟢 ${bold}ON${bold}: ${others} ON · <#${state.second}> ${state.armedSecond ? "ON" : "OFF (press On to re-arm it)"}`;
+}
+const afterClaim = () => (state.armed ? `Still ON. ${armedText()}` : "Now OFF.");
 
 // ---------- Slack API ----------
 let clockOffset = 0; // Slack's clock minus this PC's clock, in ms
@@ -238,14 +257,19 @@ async function postWithRetry(event) {
 }
 
 async function claim(event) {
-  if (!state.armed || !state.channels.includes(event.channel)) return;
+  if (!armedFor(event.channel) || !state.channels.includes(event.channel)) return;
   if (event.subtype && !["bot_message", "file_share"].includes(event.subtype)) return; // edits, joins, etc.
   if (event.user === CLAIM_USER_ID) return;
   if (isIgnored(event)) return; // never reply to people on the list (the bot stays ON for the next lead)
   if (!isLeadAlert(event)) return; // only AIBot lead alerts, never normal messages
   if (event.thread_ts && event.thread_ts !== event.ts) return; // already a reply
   if (matcher && !matcher.test(fullText(event))) return;
-  state.armed = false; // synchronous: guarantees only ONE lead is claimed
+  // Synchronous: guarantees only ONE lead per channel group is claimed.
+  // A second-channel lead turns off only the second channel; any other lead turns off both.
+  const second = isSecond(event.channel);
+  const wasSecondArmed = state.armedSecond;
+  if (second) state.armedSecond = false;
+  else { state.armed = false; state.armedSecond = false; }
   const leadMs = Number(event.ts) * 1000;
 
   // Instant mode: fire the reply right now. Nothing is awaited before it.
@@ -263,7 +287,7 @@ async function claim(event) {
 
   try {
     if (!INSTANT && (await alreadyClaimed)) {
-      await say(`ℹ️ Skipped: you already replied to that lead in <#${event.channel}>. Now OFF.`);
+      await say(`ℹ️ Skipped: you already replied to that lead in <#${event.channel}>. ${afterClaim()}`);
     } else {
       const sent = await (firstReply || postWithRetry(event));
       const actual = Math.round(Number(sent.ts) * 1000 - leadMs); // exact: Slack's own timestamps
@@ -276,10 +300,11 @@ async function claim(event) {
       sendFollowUps(event, count).catch((e) => log("follow-ups error:", e.message)); // runs in the background
       const ok = INSTANT || (actual >= MIN_MS && actual <= MAX_MS);
       log(`Claimed ${event.channel} ${event.ts}: reply landed ${actual}ms after the lead (${count} t's)`);
-      await say(`${ok ? "⚡" : "⚠️"} Claimed 1 lead in <#${event.channel}>: replied "${CLAIM_TEXT}" ${count > 1 ? `x${count} ` : ""}(first one ${actual}ms after it was posted)${ok ? "" : " (outside the 700-900ms window)"}. Now OFF.`);
+      await say(`${ok ? "⚡" : "⚠️"} Claimed 1 lead in <#${event.channel}>: replied "${CLAIM_TEXT}" ${count > 1 ? `x${count} ` : ""}(first one ${actual}ms after it was posted)${ok ? "" : " (outside the 700-900ms window)"}. ${afterClaim()}`);
     }
   } catch (err) {
-    state.armed = true; // failed: stay armed so the next lead is still claimed
+    if (second) state.armedSecond = true; // failed: stay armed so the next lead is still claimed
+    else { state.armed = true; state.armedSecond = wasSecondArmed; }
     save();
     log("Claim failed:", err.message);
     await say(`⚠️ Claim failed in <#${event.channel}>: ${hint(err.message)}. Still ON.`);
@@ -307,14 +332,27 @@ function control(event) {
     after = selfCheck;
   } else if (cmd === "unwatch" && ids.length) {
     state.channels = state.channels.filter((c) => !ids.includes(c));
+    if (ids.includes(state.second)) { state.second = null; state.armedSecond = false; }
     save();
     reply = `🛑 Stopped watching ${ids.map((i) => `<#${i}>`).join(", ")}`;
+  } else if (cmd === "second" && ids.length) {
+    state.second = ids[0];
+    if (!state.channels.includes(state.second)) state.channels.push(state.second);
+    state.armedSecond = state.armed; // joins in straight away if the bot is already ON
+    state.armedSecondAt = ((Date.now() + clockOffset) / 1000 - 1).toFixed(6);
+    save();
+    reply = `✅ <#${state.second}> is now the second channel. On claims one lead in it and stays ON for your other channels. A lead claimed anywhere else turns both off.`;
+    after = selfCheck;
+  } else if (cmd === "second" && /\boff\b/i.test(text)) {
+    const was = state.second;
+    state.second = null; state.armedSecond = false; save();
+    reply = was ? `✅ <#${was}> is a normal watched channel again (one lead in any channel turns the bot OFF). Type \`unwatch <#${was}>\` to stop watching it.` : "There is no second channel set.";
   } else if (cmd === "on") {
     arm();
-    reply = "🟢 ON: will claim the next lead, then turn off";
+    reply = state.second ? armedText() : "🟢 ON: will claim the next lead, then turn off";
     after = () => warnIfNotReady("Bot is ON");
   } else if (cmd === "off") {
-    state.armed = false; save(); reply = "🔴 OFF";
+    disarm(); reply = "🔴 OFF";
   } else if (cmd === "ignore" || cmd === "unignore") {
     const users = [...text.matchAll(/<@([UW][A-Z0-9]+)(?:\|[^>]*)?>/g)].map((m) => m[1]);
     const name = text.replace(/^\S+\s*/, "").replace(/<[@#][^>]*>/g, "").replace(/\s+/g, " ").trim();
@@ -340,7 +378,7 @@ function control(event) {
   } else if (cmd === "ping") {
     after = pingSlack;
   } else if (cmd === "status") {
-    reply = `${state.armed ? "🟢 ON" : "🔴 OFF"} · reply "${CLAIM_TEXT}" ${INSTANT ? "INSTANT" : `at ${MIN_MS}-${MAX_MS}ms`} · watching: ${state.channels.map((c) => `<#${c}>`).join(", ") || "nothing yet"} · replies once, only to AIBot "New Lead Alert" messages${state.leadBotId ? " (locked to its app ID)" : ""}\nCommands: on, off, status, check, ping, watch #channel, unwatch #channel, ignore @person, unignore @person, ignored`;
+    reply = `${armedText()} · reply "${CLAIM_TEXT}" ${INSTANT ? "INSTANT" : `at ${MIN_MS}-${MAX_MS}ms`} · watching: ${state.channels.map((c) => `<#${c}>`).join(", ") || "nothing yet"} · replies once, only to AIBot "New Lead Alert" messages${state.leadBotId ? " (locked to its app ID)" : ""}\nCommands: on, off, status, check, ping, watch #channel, unwatch #channel, second #channel, second off, ignore @person, unignore @person, ignored`;
   } else {
     panel();
     return;
@@ -353,9 +391,9 @@ function control(event) {
 function panel() {
   return slack("chat.postMessage", SLACK_BOT_TOKEN, {
     channel: CONTROL_CHANNEL,
-    text: state.armed ? "ON" : "OFF",
+    text: armedText(),
     blocks: [
-      { type: "section", text: { type: "mrkdwn", text: `${state.armed ? "🟢 *ON*: claiming the next lead" : "🔴 *OFF*"}\nWatching: ${state.channels.map((c) => `<#${c}>`).join(", ") || "nothing yet (type `watch #your-leads-channel`)"}` } },
+      { type: "section", text: { type: "mrkdwn", text: `${armedText("*")}\nWatching: ${state.channels.map((c) => `<#${c}>`).join(", ") || "nothing yet (type `watch #your-leads-channel`)"}` } },
       { type: "actions", elements: [
         { type: "button", action_id: "on", text: { type: "plain_text", text: "On" }, style: "primary" },
         { type: "button", action_id: "off", text: { type: "plain_text", text: "Off" }, style: "danger" },
@@ -374,7 +412,9 @@ async function catchUp() {
   try {
     for (const channel of state.channels) {
       if (!state.armed) break;
-      const { messages = [] } = await slack("conversations.history", SLACK_USER_TOKEN, { channel, oldest: state.armedAt, limit: 50 }, 7000);
+      if (!armedFor(channel)) continue;
+      const oldest = isSecond(channel) ? state.armedSecondAt : state.armedAt;
+      const { messages = [] } = await slack("conversations.history", SLACK_USER_TOKEN, { channel, oldest, limit: 50 }, 7000);
       for (const m of messages.reverse()) await claim({ ...m, channel });
     }
     pollFails = 0;
@@ -435,7 +475,7 @@ function onMessage(msg) {
     const a = msg.payload.actions?.[0]?.action_id;
     if (a === "on" || a === "off") {
       if (a === "on") arm();
-      else { state.armed = false; save(); }
+      else disarm();
       panel();
       if (a === "on") warnIfNotReady("Bot is ON").catch((e) => log("readiness failed:", e.message));
     }
@@ -523,4 +563,4 @@ if (require.main === module) {
     supervise();
   }
 }
-module.exports = { claim, state, arm, slack, calibrate, pickReplyCount, config }; // for tests
+module.exports = { claim, control, state, arm, slack, calibrate, pickReplyCount, config }; // for tests
