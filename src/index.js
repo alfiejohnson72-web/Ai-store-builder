@@ -29,6 +29,7 @@ if (problems.length) throw new Error("Fix your .env file:\n - " + problems.join(
 const CLAIM_TEXT = "t"; // the reply is always exactly "t"
 const INSTANT = true; // true = reply the moment the lead arrives (no delay, no checks in the way); false = timed reply (below)
 const MIN_MS = 700, MAX_MS = 900, TARGET_MS = 780; // timed mode: the first reply lands this long after the lead
+const MAX_LEAD_AGE_MS = 60000; // only leads posted in the last minute are claimed
 const matcher = CLAIM_MATCH ? new RegExp(CLAIM_MATCH, "i") : null;
 const log = (...a) => console.log(new Date().toLocaleTimeString(), ...a);
 
@@ -264,6 +265,7 @@ async function claim(event) {
   if (!isLeadAlert(event)) return; // only AIBot lead alerts, never normal messages
   if (event.thread_ts && event.thread_ts !== event.ts) return; // already a reply
   if (matcher && !matcher.test(fullText(event))) return;
+  if ((Date.now() + clockOffset) - Number(event.ts) * 1000 > MAX_LEAD_AGE_MS) return; // stale (e.g. found by catch-up after downtime): never claim
   // Synchronous: guarantees only ONE lead per channel group is claimed.
   // A second-channel lead turns off only the second channel; any other lead turns off both.
   const second = isSecond(event.channel);
