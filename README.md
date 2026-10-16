@@ -24,7 +24,15 @@ The bot posts a panel in Bot Control with **On** and **Off** buttons.
 2. Press **On**. It claims the **next one lead** in optin-1 with a lowercase `t` as you, then turns itself off and tells you.
 3. Press **On** again for the next lead.
 
-Text commands (only you are obeyed): `on`, `off`, `status`, `watch #channel`, `unwatch #channel`.
+### Watching optin-2 as well (second channel)
+Type `second #optin-2` once. From then on, **On** arms both channels:
+- A lead claimed in **optin-2** turns off optin-2 only. The bot stays ON for optin-1.
+- A lead claimed in **optin-1** turns everything off, optin-2 included.
+- Pressing **On** again re-arms optin-2.
+
+Type `second off` to go back to one lead in any channel turning the bot off.
+
+Text commands (only you are obeyed): `on`, `off`, `status`, `watch #channel`, `unwatch #channel`, `second #channel`, `second off`.
 
 Bot- or form-posted leads are claimed too. Set `CLAIM_MATCH` (regex) if a channel has non-lead chatter.
 
