@@ -22,6 +22,7 @@ const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "lc-"));
 fs.mkdirSync(path.join(tmp, "src"));
 fs.copyFileSync(path.join(__dirname, "..", "src", "index.js"), path.join(tmp, "src", "index.js"));
 const bot = require(path.join(tmp, "src", "index.js"));
+bot.config.post = (body) => bot.slack("chat.postMessage", "xoxp-test", body); // the fast lane, through the fake Slack
 
 const tReplies = () => calls.filter((c) => c.method === "chat.postMessage" && c.token === "xoxp-test");
 let freshN = 0;

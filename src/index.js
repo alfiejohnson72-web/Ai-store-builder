@@ -112,6 +112,41 @@ async function slack(method, token, body, timeoutMs = 8000) {
   return json;
 }
 
+// ---------- fast lane: private, always-warm connections used ONLY for the "t" ----------
+// Nothing else (backup checks, Bot Control messages) ever uses these, so the claim never queues behind
+// another request or waits for a new secure connection to be set up.
+const https = require("node:https");
+const fastAgent = new https.Agent({ keepAlive: true, keepAliveMsecs: 1000, maxSockets: 4, maxFreeSockets: 4, scheduling: "lifo" });
+const FAST_WARM = 2; // connections kept open and ready
+function fastSlack(method, token, body, timeoutMs = 4000) {
+  return new Promise((resolve, reject) => {
+    const data = JSON.stringify(body ?? {});
+    const req = https.request({
+      host: "slack.com", path: `/api/${method}`, method: "POST", agent: fastAgent, timeout: timeoutMs,
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json; charset=utf-8", "Content-Length": Buffer.byteLength(data) },
+    }, (res) => {
+      let raw = "";
+      res.setEncoding("utf8");
+      res.on("data", (c) => (raw += c));
+      res.on("end", () => {
+        let json;
+        try { json = JSON.parse(raw); } catch { return reject(new Error(`${method}: bad_response_${res.statusCode}`)); }
+        if (!json.ok) return reject(new Error(`${method}: ${json.error}`));
+        resolve(json);
+      });
+    });
+    req.setNoDelay(true);
+    req.on("timeout", () => req.destroy(new Error(`${method}: timed out`)));
+    req.on("error", reject);
+    req.end(data);
+  });
+}
+// Keep FAST_WARM connections open by sending a tiny request down each one.
+function warmFastLane() {
+  for (let i = 0; i < FAST_WARM; i++) fastSlack("api.test", SLACK_USER_TOKEN, {}, 4000).catch(() => {});
+}
+const config = { forceCount: null, post: (body) => fastSlack("chat.postMessage", SLACK_USER_TOKEN, body) }; // tests replace post
+
 // Post and delete a tiny message in Bot Control so we learn Slack's clock precisely.
 async function calibrate() {
   try {
@@ -179,13 +214,13 @@ const hint = (msg) => {
   return HINTS[code] ? `${msg} (${HINTS[code]})` : msg;
 };
 
-// Measure the real round trip from wherever this bot runs to Slack (lower = faster).
+// Measure the real round trip from wherever this bot runs to Slack over the same fast lane the "t" uses (lower = faster).
 async function pingSlack() {
   const times = [];
   for (let i = 0; i < 7; i++) {
     const t0 = Date.now();
     try {
-      await slack("auth.test", SLACK_USER_TOKEN, {}, 4000);
+      await fastSlack("auth.test", SLACK_USER_TOKEN, {}, 4000);
       times.push(Date.now() - t0);
     } catch {}
     await new Promise((r) => setTimeout(r, 120));
@@ -227,7 +262,6 @@ async function selfCheck() {
 
 // ---------- claiming ----------
 // How many "t" replies to send: always exactly one.
-const config = { forceCount: null }; // tests only
 function pickReplyCount() {
   return config.forceCount || 1;
 }
@@ -248,16 +282,16 @@ async function sendFollowUps(event, count) {
 async function postWithRetry(event) {
   for (let i = 0; ; i++) {
     try {
-      const sent = await slack("chat.postMessage", SLACK_USER_TOKEN, { channel: event.channel, thread_ts: event.ts, text: CLAIM_TEXT }, 4000);
+      const sent = await config.post({ channel: event.channel, thread_ts: event.ts, text: CLAIM_TEXT });
       return { ...sent, tries: i + 1 };
     } catch (err) {
       if (i >= 2 || /not_in_channel|channel_not_found|invalid_auth|token_revoked|account_inactive|missing_scope|is_archived/.test(err.message)) throw err;
-      await new Promise((r) => setTimeout(r, 120 * (i + 1)));
+      await new Promise((r) => setTimeout(r, 40 * (i + 1)));
     }
   }
 }
 
-async function claim(event) {
+async function claim(event, heardAt = Date.now()) {
   if (!armedFor(event.channel) || !state.channels.includes(event.channel)) return;
   if (event.subtype && !["bot_message", "file_share"].includes(event.subtype)) return; // edits, joins, etc.
   if (event.user === CLAIM_USER_ID) return;
@@ -301,8 +335,9 @@ async function claim(event) {
       const count = pickReplyCount();
       sendFollowUps(event, count).catch((e) => log("follow-ups error:", e.message)); // runs in the background
       const ok = INSTANT || (actual >= MIN_MS && actual <= MAX_MS);
-      log(`Claimed ${event.channel} ${event.ts}: reply landed ${actual}ms after the lead (${count} t's)`);
-      await say(`${ok ? "⚡" : "⚠️"} Claimed 1 lead in <#${event.channel}>: replied "${CLAIM_TEXT}" ${count > 1 ? `x${count} ` : ""}(first one ${actual}ms after it was posted)${ok ? "" : " (outside the 700-900ms window)"}. ${afterClaim()}`);
+      const heard = Math.max(0, Math.round(heardAt + clockOffset - leadMs)); // how late Slack told us about the lead
+      log(`Claimed ${event.channel} ${event.ts}: Slack told us ${heard}ms after the lead, reply landed ${actual}ms after it (${count} t's)`);
+      await say(`${ok ? "⚡" : "⚠️"} Claimed 1 lead in <#${event.channel}>: replied "${CLAIM_TEXT}" ${count > 1 ? `x${count} ` : ""}(landed ${actual}ms after the lead; Slack told us about it after ~${heard}ms, so our part took ~${Math.max(0, actual - heard)}ms)${ok ? "" : " (outside the 700-900ms window)"}. ${afterClaim()}`);
     }
   } catch (err) {
     if (second) state.armedSecond = true; // failed: stay armed so the next lead is still claimed
@@ -351,6 +386,7 @@ function control(event) {
     reply = was ? `✅ <#${was}> is a normal watched channel again (one lead in any channel turns the bot OFF). Type \`unwatch <#${was}>\` to stop watching it.` : "There is no second channel set.";
   } else if (cmd === "on") {
     arm();
+    warmFastLane();
     reply = state.second ? armedText() : "🟢 ON: will claim the next lead, then turn off";
     after = () => warnIfNotReady("Bot is ON");
   } else if (cmd === "off") {
@@ -432,7 +468,7 @@ async function catchUp() {
 }
 every(() => catchUp().catch(() => {}), 1200);
 every(() => { if (state.armed) calibrate(); }, 180000); // keep the clock fresh while ON
-every(() => { if (state.armed) slack("auth.test", SLACK_USER_TOKEN, {}, 4000).catch(() => {}); }, 3000); // while ON: keep the connection to Slack warm so the reply never waits for a new handshake
+every(() => { if (state.armed) warmFastLane(); }, 2500); // while ON: keep the fast lane warm so the reply never waits for a new handshake
 
 // While ON, re-check every 5 minutes that keys and channels still work, so a problem is reported BEFORE a lead arrives.
 async function readiness() {
@@ -466,17 +502,17 @@ function scheduleReconnect() {
   backoff = Math.min(backoff * 2, 30000);
 }
 
-function onMessage(msg) {
+function onMessage(msg, heardAt) {
   lastActivity = Date.now();
   if (msg.type === "events_api" && msg.payload.event?.type === "message") {
     const e = msg.payload.event;
     if (e.channel === CONTROL_CHANNEL) control(e);
-    else claim(e).catch((err) => log("claim error:", err.message));
+    else claim(e, heardAt).catch((err) => log("claim error:", err.message));
   }
   if (msg.type === "interactive" && msg.payload.user?.id === CLAIM_USER_ID) {
     const a = msg.payload.actions?.[0]?.action_id;
     if (a === "on" || a === "off") {
-      if (a === "on") arm();
+      if (a === "on") { arm(); warmFastLane(); }
       else disarm();
       panel();
       if (a === "on") warnIfNotReady("Bot is ON").catch((e) => log("readiness failed:", e.message));
@@ -506,11 +542,12 @@ async function connect() {
     };
     sock.onmessage = (m) => {
       if (ws !== sock) return;
+      const heardAt = Date.now();
       try {
         const msg = JSON.parse(m.data);
-        if (msg.envelope_id) sock.send(JSON.stringify({ envelope_id: msg.envelope_id })); // ack immediately
         if (msg.type === "disconnect") return sock.close();
-        onMessage(msg);
+        onMessage(msg, heardAt); // the "t" is already on its way before we even acknowledge the event
+        if (msg.envelope_id) sock.send(JSON.stringify({ envelope_id: msg.envelope_id }));
       } catch (e) {
         log("message error:", e.message);
       }
@@ -551,6 +588,10 @@ function supervise() {
       setTimeout(run, 2000);
     });
   };
+  // On a Mac: stop it napping or sleeping while the bot runs (a napping Mac reacts slowly). The screen can still turn off.
+  if (process.platform === "darwin") {
+    try { spawn("caffeinate", ["-i", "-m", "-s", "-w", String(process.pid)], { stdio: "ignore" }).on("error", () => {}); } catch {}
+  }
   for (const sig of ["SIGINT", "SIGTERM"]) {
     process.on(sig, () => { stopping = true; try { child && child.kill(); } catch {} setTimeout(() => process.exit(0), 500); });
   }
@@ -560,6 +601,7 @@ function supervise() {
 if (require.main === module) {
   if (process.env.BOT_CHILD) {
     startTimers();
+    warmFastLane();
     connect();
   } else {
     supervise();
