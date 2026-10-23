@@ -489,6 +489,7 @@ async function warnIfNotReady(prefix) {
 every(() => { if (state.armed) warnIfNotReady("Bot is ON").catch(() => {}); }, 300000);
 
 // ---------- connection: reconnects forever, with a watchdog ----------
+// A new connection is always opened BEFORE the old one is closed, so there is never a moment with no one listening.
 let ws = null;
 let gen = 0;
 let backoff = 1000;
@@ -526,8 +527,12 @@ async function connect() {
     const { url } = await slack("apps.connections.open", SLACK_APP_TOKEN);
     if (my !== gen) return;
     const sock = new WebSocket(url);
-    ws = sock;
+    let opened = false;
     sock.onopen = async () => {
+      opened = true;
+      const old = ws;
+      ws = sock; // the new connection takes over; the old one keeps listening a few more seconds, then closes
+      if (old && old !== sock) setTimeout(() => { try { old.close(); } catch {} }, 5000);
       backoff = 1000;
       lastActivity = Date.now();
       log("Connected.");
@@ -541,11 +546,13 @@ async function connect() {
       catchUp().catch(() => {}); // anything that landed while we were offline
     };
     sock.onmessage = (m) => {
-      if (ws !== sock) return;
-      const heardAt = Date.now();
+      const heardAt = Date.now(); // events from the outgoing connection still count while the new one takes over
       try {
         const msg = JSON.parse(m.data);
-        if (msg.type === "disconnect") return sock.close();
+        if (msg.type === "disconnect") { // Slack is about to close this one: open the next one first
+          if (ws === sock) connect();
+          return;
+        }
         onMessage(msg, heardAt); // the "t" is already on its way before we even acknowledge the event
         if (msg.envelope_id) sock.send(JSON.stringify({ envelope_id: msg.envelope_id }));
       } catch (e) {
@@ -553,7 +560,11 @@ async function connect() {
       }
     };
     sock.onclose = () => {
-      if (ws !== sock) return;
+      if (ws !== sock) { // an old connection we already replaced, or a new one that never opened
+        if (!opened) { log("New connection failed, retrying..."); scheduleReconnect(); }
+        return;
+      }
+      ws = null;
       log("Disconnected, reconnecting...");
       scheduleReconnect();
     };
@@ -567,12 +578,9 @@ async function connect() {
 // Watchdog: if nothing has been heard for 3 minutes the connection may be dead without saying so; start a fresh one.
 every(() => {
   if (!ws || Date.now() - lastActivity < 180000) return;
-  log("No activity for 3 minutes, reconnecting...");
-  const old = ws;
-  ws = null;
+  log("No activity for 3 minutes, refreshing the connection...");
   lastActivity = Date.now();
-  try { old.close(); } catch {}
-  connect();
+  connect(); // the old connection stays open until the new one is ready
 }, 30000);
 
 // Supervisor: runs the bot as a child process and restarts it within 2 seconds if it ever exits for any reason.
