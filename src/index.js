@@ -553,8 +553,13 @@ async function connect() {
           if (ws === sock) connect();
           return;
         }
-        onMessage(msg, heardAt); // the "t" is already on its way before we even acknowledge the event
-        if (msg.envelope_id) sock.send(JSON.stringify({ envelope_id: msg.envelope_id }));
+        const ack = () => { if (msg.envelope_id) try { sock.send(JSON.stringify({ envelope_id: msg.envelope_id })); } catch {} };
+        if (msg.type !== "events_api") ack(); // button clicks: answer Slack first, so it never shows a ⚠️
+        try {
+          onMessage(msg, heardAt); // for a lead, the "t" is already on its way before we acknowledge the event
+        } finally {
+          if (msg.type === "events_api") ack(); // always acknowledged, even if handling it failed
+        }
       } catch (e) {
         log("message error:", e.message);
       }
