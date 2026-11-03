@@ -1,6 +1,6 @@
 // Zero-dependency Slack lead claimer: Socket Mode over WebSocket + Web API over fetch.
-// Press On in Bot Control -> claims every new lead in watched channels with a lowercase "t" (as you),
-// replying the instant each lead arrives (INSTANT mode), until you press Off.
+// Press On in Bot Control -> claims the NEXT lead in watched channels with a lowercase "t" (as you),
+// replies the instant the lead arrives (INSTANT mode), then turns itself off.
 const fs = require("node:fs");
 const path = require("node:path");
 
@@ -77,7 +77,6 @@ const armedFor = (channel) => (isSecond(channel) ? state.armedSecond : state.arm
 // What is armed right now, in words, for Bot Control.
 function armedText(bold = "") {
   if (!state.armed) return `🔴 ${bold}OFF${bold}`;
-  if (config.stayOn) return `🟢 ${bold}ON${bold}: claiming every new lead until you press Off`;
   if (!state.second) return `🟢 ${bold}ON${bold}: claiming the next lead`;
   const others = state.channels.filter((c) => c !== state.second).map((c) => `<#${c}>`).join(", ") || "your other channels";
   return `🟢 ${bold}ON${bold}: ${others} ON · <#${state.second}> ${state.armedSecond ? "ON" : "OFF (press On to re-arm it)"}`;
@@ -146,8 +145,7 @@ function fastSlack(method, token, body, timeoutMs = 4000) {
 function warmFastLane() {
   for (let i = 0; i < FAST_WARM; i++) fastSlack("api.test", SLACK_USER_TOKEN, {}, 4000).catch(() => {});
 }
-// stayOn: true = after a claim the bot stays ON and claims every new lead until you press Off.
-const config = { stayOn: true, forceCount: null, post: (body) => fastSlack("chat.postMessage", SLACK_USER_TOKEN, body) }; // tests replace post
+const config = { forceCount: null, post: (body) => fastSlack("chat.postMessage", SLACK_USER_TOKEN, body) }; // tests replace post
 
 // Post and delete a tiny message in Bot Control so we learn Slack's clock precisely.
 async function calibrate() {
@@ -293,7 +291,6 @@ async function postWithRetry(event) {
   }
 }
 
-const claimedLeads = new Set(state.claimed || []); // "channel:ts" of leads already answered (kept across restarts)
 async function claim(event, heardAt = Date.now()) {
   if (!armedFor(event.channel) || !state.channels.includes(event.channel)) return;
   if (event.subtype && !["bot_message", "file_share"].includes(event.subtype)) return; // edits, joins, etc.
@@ -303,19 +300,12 @@ async function claim(event, heardAt = Date.now()) {
   if (event.thread_ts && event.thread_ts !== event.ts) return; // already a reply
   if (matcher && !matcher.test(fullText(event))) return;
   if ((Date.now() + clockOffset) - Number(event.ts) * 1000 > MAX_LEAD_AGE_MS) return; // stale (e.g. found by catch-up after downtime): never claim
-  // Synchronous: guarantees each lead gets only ONE "t", even if it arrives twice (live + backup check).
-  const key = event.channel + ":" + event.ts;
-  if (claimedLeads.has(key)) return;
-  claimedLeads.add(key);
-  if (claimedLeads.size > 200) claimedLeads.delete(claimedLeads.values().next().value);
-  state.claimed = [...claimedLeads].slice(-50); // saved to disk with the claim
-  // Stay-on mode: nothing turns off. Otherwise: a second-channel lead turns off only the second channel; any other lead turns off both.
+  // Synchronous: guarantees only ONE lead per channel group is claimed.
+  // A second-channel lead turns off only the second channel; any other lead turns off both.
   const second = isSecond(event.channel);
   const wasSecondArmed = state.armedSecond;
-  if (!config.stayOn) {
-    if (second) state.armedSecond = false;
-    else { state.armed = false; state.armedSecond = false; }
-  }
+  if (second) state.armedSecond = false;
+  else { state.armed = false; state.armedSecond = false; }
   const leadMs = Number(event.ts) * 1000;
 
   // Instant mode: fire the reply right now. Nothing is awaited before it.
@@ -350,10 +340,7 @@ async function claim(event, heardAt = Date.now()) {
       await say(`${ok ? "⚡" : "⚠️"} Claimed 1 lead in <#${event.channel}>: replied "${CLAIM_TEXT}" ${count > 1 ? `x${count} ` : ""}(landed ${actual}ms after the lead; Slack told us about it after ~${heard}ms, so our part took ~${Math.max(0, actual - heard)}ms)${ok ? "" : " (outside the 700-900ms window)"}. ${afterClaim()}`);
     }
   } catch (err) {
-    claimedLeads.delete(key); // failed: the backup check may still claim this lead
-    state.claimed = [...claimedLeads].slice(-50);
-    if (config.stayOn) {} // was never turned off
-    else if (second) state.armedSecond = true; // failed: stay armed so the next lead is still claimed
+    if (second) state.armedSecond = true; // failed: stay armed so the next lead is still claimed
     else { state.armed = true; state.armedSecond = wasSecondArmed; }
     save();
     log("Claim failed:", err.message);
@@ -400,7 +387,7 @@ function control(event) {
   } else if (cmd === "on") {
     arm();
     warmFastLane();
-    reply = state.second || config.stayOn ? armedText() : "🟢 ON: will claim the next lead, then turn off";
+    reply = state.second ? armedText() : "🟢 ON: will claim the next lead, then turn off";
     after = () => warnIfNotReady("Bot is ON");
   } else if (cmd === "off") {
     disarm(); reply = "🔴 OFF";
