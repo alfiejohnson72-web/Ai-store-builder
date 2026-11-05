@@ -1,6 +1,6 @@
 // Zero-dependency Slack lead claimer: Socket Mode over WebSocket + Web API over fetch.
-// Press On in Bot Control -> claims every new lead in watched channels with a lowercase "t" (as you),
-// replying the instant each lead arrives (INSTANT mode), until you press Off.
+// Press "On (1 lead)" in Bot Control -> claims the next lead with a lowercase "t" (as you), then turns OFF.
+// Press "On (keep going)" -> claims every new lead until you press Off. Replies the instant each lead arrives.
 const fs = require("node:fs");
 const path = require("node:path");
 
@@ -46,7 +46,7 @@ function startTimers() { for (const [fn, ms] of timerJobs) setInterval(fn, ms); 
 const STATE_FILE = path.join(__dirname, "..", "state.json");
 const NEVER_REPLY_NAMES = ["Jase Chijioke"]; // built in: never reply to this person, or to alerts naming them
 // Optional second channel (e.g. optin-2): claiming there turns off only that channel; claiming anywhere else turns off both.
-const state = { armed: false, armedAt: "0", second: null, armedSecond: false, armedSecondAt: "0", leadBotId: null, ignoredUsers: [], ignoredNames: [], channels: CLAIM_CHANNELS.split(",").map((s) => s.trim()).filter(Boolean) };
+const state = { armed: false, stayOn: false, armedAt: "0", second: null, armedSecond: false, armedSecondAt: "0", leadBotId: null, ignoredUsers: [], ignoredNames: [], channels: CLAIM_CHANNELS.split(",").map((s) => s.trim()).filter(Boolean) };
 try {
   Object.assign(state, JSON.parse(fs.readFileSync(STATE_FILE, "utf8")));
 } catch {}
@@ -59,7 +59,9 @@ function save() {
     log("Could not save state:", e.message);
   }
 }
-function arm() {
+// keep = false: claim ONE lead, then turn OFF. keep = true: stay ON and claim every new lead until Off.
+function arm(keep = false) {
+  state.stayOn = !!keep;
   const now = ((Date.now() + clockOffset) / 1000 - 1).toFixed(6); // Slack's clock, 1s margin
   if (!state.armed) state.armedAt = now;
   if (state.second && !state.armedSecond) state.armedSecondAt = now;
@@ -77,7 +79,7 @@ const armedFor = (channel) => (isSecond(channel) ? state.armedSecond : state.arm
 // What is armed right now, in words, for Bot Control.
 function armedText(bold = "") {
   if (!state.armed) return `🔴 ${bold}OFF${bold}`;
-  if (config.stayOn) return `🟢 ${bold}ON${bold}: claiming every new lead until you press Off`;
+  if (state.stayOn) return `🟢 ${bold}ON${bold}: claiming every new lead until you press Off`;
   if (!state.second) return `🟢 ${bold}ON${bold}: claiming the next lead`;
   const others = state.channels.filter((c) => c !== state.second).map((c) => `<#${c}>`).join(", ") || "your other channels";
   return `🟢 ${bold}ON${bold}: ${others} ON · <#${state.second}> ${state.armedSecond ? "ON" : "OFF (press On to re-arm it)"}`;
@@ -146,8 +148,7 @@ function fastSlack(method, token, body, timeoutMs = 4000) {
 function warmFastLane() {
   for (let i = 0; i < FAST_WARM; i++) fastSlack("api.test", SLACK_USER_TOKEN, {}, 4000).catch(() => {});
 }
-// stayOn: true = after a claim the bot stays ON and claims every new lead until you press Off.
-const config = { stayOn: true, forceCount: null, post: (body) => fastSlack("chat.postMessage", SLACK_USER_TOKEN, body) }; // tests replace post
+const config = { forceCount: null, post: (body) => fastSlack("chat.postMessage", SLACK_USER_TOKEN, body) }; // tests replace post
 
 // Post and delete a tiny message in Bot Control so we learn Slack's clock precisely.
 async function calibrate() {
@@ -312,7 +313,7 @@ async function claim(event, heardAt = Date.now()) {
   // Stay-on mode: nothing turns off. Otherwise: a second-channel lead turns off only the second channel; any other lead turns off both.
   const second = isSecond(event.channel);
   const wasSecondArmed = state.armedSecond;
-  if (!config.stayOn) {
+  if (!state.stayOn) {
     if (second) state.armedSecond = false;
     else { state.armed = false; state.armedSecond = false; }
   }
@@ -352,7 +353,7 @@ async function claim(event, heardAt = Date.now()) {
   } catch (err) {
     claimedLeads.delete(key); // failed: the backup check may still claim this lead
     state.claimed = [...claimedLeads].slice(-50);
-    if (config.stayOn) {} // was never turned off
+    if (state.stayOn) {} // was never turned off
     else if (second) state.armedSecond = true; // failed: stay armed so the next lead is still claimed
     else { state.armed = true; state.armedSecond = wasSecondArmed; }
     save();
@@ -398,9 +399,10 @@ function control(event) {
     state.second = null; state.armedSecond = false; save();
     reply = was ? `✅ <#${was}> is a normal watched channel again (one lead in any channel turns the bot OFF). Type \`unwatch <#${was}>\` to stop watching it.` : "There is no second channel set.";
   } else if (cmd === "on") {
-    arm();
+    const keep = /\b(all|keep|every)\b/i.test(text); // "on" = one lead; "on all" / "on keep" = keep going
+    arm(keep);
     warmFastLane();
-    reply = state.second || config.stayOn ? armedText() : "🟢 ON: will claim the next lead, then turn off";
+    reply = state.second || keep ? armedText() : "🟢 ON: will claim the next lead, then turn off";
     after = () => warnIfNotReady("Bot is ON");
   } else if (cmd === "off") {
     disarm(); reply = "🔴 OFF";
@@ -429,7 +431,7 @@ function control(event) {
   } else if (cmd === "ping") {
     after = pingSlack;
   } else if (cmd === "status") {
-    reply = `${armedText()} · reply "${CLAIM_TEXT}" ${INSTANT ? "INSTANT" : `at ${MIN_MS}-${MAX_MS}ms`} · watching: ${state.channels.map((c) => `<#${c}>`).join(", ") || "nothing yet"} · replies once, only to AIBot "New Lead Alert" messages${state.leadBotId ? " (locked to its app ID)" : ""}\nCommands: on, off, status, check, ping, watch #channel, unwatch #channel, second #channel, second off, ignore @person, unignore @person, ignored`;
+    reply = `${armedText()} · reply "${CLAIM_TEXT}" ${INSTANT ? "INSTANT" : `at ${MIN_MS}-${MAX_MS}ms`} · watching: ${state.channels.map((c) => `<#${c}>`).join(", ") || "nothing yet"} · replies once, only to AIBot "New Lead Alert" messages${state.leadBotId ? " (locked to its app ID)" : ""}\nCommands: on (1 lead), on all (keep going), off, status, check, ping, watch #channel, unwatch #channel, second #channel, second off, ignore @person, unignore @person, ignored`;
   } else {
     panel();
     return;
@@ -446,7 +448,8 @@ function panel() {
     blocks: [
       { type: "section", text: { type: "mrkdwn", text: `${armedText("*")}\nWatching: ${state.channels.map((c) => `<#${c}>`).join(", ") || "nothing yet (type `watch #your-leads-channel`)"}` } },
       { type: "actions", elements: [
-        { type: "button", action_id: "on", text: { type: "plain_text", text: "On" }, style: "primary" },
+        { type: "button", action_id: "on", text: { type: "plain_text", text: "On (1 lead)" }, style: "primary" },
+        { type: "button", action_id: "on_keep", text: { type: "plain_text", text: "On (keep going)" }, style: "primary" },
         { type: "button", action_id: "off", text: { type: "plain_text", text: "Off" }, style: "danger" },
       ] },
     ],
@@ -525,11 +528,11 @@ function onMessage(msg, heardAt) {
   }
   if (msg.type === "interactive" && msg.payload.user?.id === CLAIM_USER_ID) {
     const a = msg.payload.actions?.[0]?.action_id;
-    if (a === "on" || a === "off") {
-      if (a === "on") { arm(); warmFastLane(); }
-      else disarm();
+    if (a === "on" || a === "on_keep" || a === "off") {
+      if (a === "off") disarm();
+      else { arm(a === "on_keep"); warmFastLane(); }
       panel();
-      if (a === "on") warnIfNotReady("Bot is ON").catch((e) => log("readiness failed:", e.message));
+      if (a !== "off") warnIfNotReady("Bot is ON").catch((e) => log("readiness failed:", e.message));
     }
   }
 }
