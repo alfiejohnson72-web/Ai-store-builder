@@ -19,10 +19,11 @@ It installs Node.js if needed, downloads the newest bot to `%USERPROFILE%\LeadCl
 7. `npm start` and leave it running.
 
 ## Using it
-The bot posts a panel in Bot Control with **On** and **Off** buttons.
+The bot posts a panel in Bot Control with **On (1 lead)**, **On (keep going)** and **Off** buttons.
 1. Type `watch #optin-1` once (pick the channel from Slack's dropdown).
-2. Press **On**. It claims **every new lead** in your watched channels with a lowercase `t` as you, and tells you each time.
-3. It stays ON until you press **Off**. (To go back to one lead per On, set `stayOn: false` in `src/index.js`.)
+2. Press **On (1 lead)**: it claims the **next lead** with a lowercase `t` as you, then turns itself OFF and tells you.
+3. Or press **On (keep going)**: it claims **every new lead** (one `t` each) until you press **Off**.
+   Typed commands do the same: `on` (1 lead), `on all` (keep going), `off`.
 
 ### Watching optin-2 as well (second channel)
 Type `second #optin-2` once. From then on, **On** arms both channels:
