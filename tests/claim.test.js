@@ -23,6 +23,7 @@ fs.mkdirSync(path.join(tmp, "src"));
 fs.copyFileSync(path.join(__dirname, "..", "src", "index.js"), path.join(tmp, "src", "index.js"));
 const bot = require(path.join(tmp, "src", "index.js"));
 bot.config.post = (body) => bot.slack("chat.postMessage", "xoxp-test", body); // the fast lane, through the fake Slack
+bot.config.stayOn = false; // the tests below check the one-lead-then-OFF mode; stay-on mode is tested at the end
 
 const tReplies = () => calls.filter((c) => c.method === "chat.postMessage" && c.token === "xoxp-test");
 let freshN = 0;
@@ -172,6 +173,44 @@ const lead = (extra = {}) => ({
     await bot.claim(lead({ ts: String(Date.now() / 1000 - 25 * 60) }));
     assert.strictEqual(tReplies().length, 0);
     assert.strictEqual(bot.state.armed, true);
+  });
+
+  await test("stay-on mode: claims every new lead and stays ON until Off", async () => {
+    bot.config.stayOn = true;
+    bot.arm();
+    await bot.claim(lead({ ts: fresh() }));
+    await bot.claim(lead({ ts: fresh() }));
+    assert.strictEqual(tReplies().length, 2);
+    assert.strictEqual(bot.state.armed, true);
+    bot.control({ channel: "CCTRL", user: "UME", ts: fresh(), text: "off" });
+    await bot.claim(lead({ ts: fresh() }));
+    assert.strictEqual(tReplies().length, 2);
+    bot.config.stayOn = false;
+    await wait(50);
+  });
+
+  await test("stay-on mode: the same lead seen twice (live + backup check) gets only one 't'", async () => {
+    bot.config.stayOn = true;
+    bot.arm();
+    const one = lead({ ts: fresh() });
+    await Promise.all([bot.claim(one), bot.claim({ ...one })]);
+    await bot.claim({ ...one });
+    assert.strictEqual(tReplies().length, 1);
+    bot.config.stayOn = false;
+    await wait(50);
+  });
+
+  await test("stay-on mode: a second-channel lead keeps everything ON", async () => {
+    bot.config.stayOn = true;
+    withSecond();
+    bot.arm();
+    await bot.claim(lead({ channel: "COPT2", ts: fresh() }));
+    await bot.claim(lead({ ts: fresh() }));
+    assert.strictEqual(tReplies().length, 2);
+    assert.strictEqual(bot.state.armed, true);
+    assert.strictEqual(bot.state.armedSecond, true);
+    bot.config.stayOn = false;
+    await wait(50);
   });
 
   console.log(`\nAll ${n} tests passed.`);
